@@ -88,12 +88,33 @@ public class SpotMatch implements Comparable<SpotMatch> {
 	}
 
 	@Override
-	public int compareTo(SpotMatch m) {
+	public int compareTo(SpotMatch m) 
+	{
+		/*
 		if (spot.getIdf() > m.spot.getIdf())
 			return 1;
 		if (spot.getIdf() < m.spot.getIdf())
 			return -1;
 		return 1;
+		*/
+		
+		//CAMBIATA
+		/*
+		 * Ora verrà preservato l'ordine degli spot matchati nel documento.
+		 */
+		if (this.field.getId() < m.field.getId())
+			return -1;
+		else if( this.field.getId() > m.field.getId())
+			return 1;
+		else
+		{	
+			if( this.start < m.start)
+				return -1;
+			else if (this.start > m.start)
+				return 1;
+		}
+		
+		return 0;
 	}
 
 	@Override

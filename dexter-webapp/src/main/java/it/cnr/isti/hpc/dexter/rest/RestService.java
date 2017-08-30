@@ -302,9 +302,20 @@ public class RestService {
 			logger.error(e.getMessage());
 			return error(e.getMessage());
 		}
-
+		
 		EntityMatchList eml = tagger.tag(requestParams, doc);
-
+		
+		//TEST
+		System.out.println("Vediamo cosa c'è in eml. Nota bene: DISAMBIGUAZIONE FINITA");
+		for (EntityMatch em : eml)
+		{
+			Entity e = em.getEntity();
+			SpotMatch sm = em.getSpot();
+			Spot spotTemp = sm.getSpot();
+			System.out.println("mention: " + spotTemp.getMention() + "\nEntity id: " + e.getId());
+							
+		}
+		
 		AnnotatedDocument adoc = new AnnotatedDocument(doc);
 
 		if (debug) {
@@ -339,8 +350,9 @@ public class RestService {
 		for (int i = 0; i < size; i++) {
 			EntityMatch em = eml.get(i);
 			if (em.getScore() < minConfidence) {
-				logger.debug("remove entity {}, confidence {} to low",
-						em.getId(), em.getScore());
+				//logger.debug("remove entity {}, confidence {} to low",
+					//	em.getId(), em.getScore());
+				System.out.println("remove entity " + em.getId() + " confidence " + em.getScore() + " too low");
 				continue;
 			}
 			emlSub.add(em);

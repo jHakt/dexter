@@ -47,6 +47,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -72,7 +73,9 @@ import com.sun.jersey.api.client.Client;
  *         Created on Oct 29, 2013
  */
 // TODO rewrite using the jersey-client
-public class DexterRestClient {
+
+public class DexterRestClient 
+{
 
 	private final URI server;
 	private final FakeBrowser browser;
@@ -94,8 +97,7 @@ public class DexterRestClient {
 
 	private static Gson gson = new Gson();
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(DexterRestClient.class);
+	private static final Logger logger = LoggerFactory.getLogger(DexterRestClient.class);
 
 	/**
 	 * Istanciates a Rest client, that invocates the rest service provided by a
@@ -104,7 +106,8 @@ public class DexterRestClient {
 	 * @param server
 	 *            the url of the rest service
 	 */
-	public DexterRestClient(String server) throws URISyntaxException {
+	public DexterRestClient(String server) throws URISyntaxException 
+	{
 		this(new URI(server));
 
 	}
@@ -116,12 +119,14 @@ public class DexterRestClient {
 	 * @param server
 	 *            the url of the rest service
 	 */
-	public DexterRestClient(URI server) {
+	public DexterRestClient(URI server) 
+	{
 		this.server = server;
 		browser = new FakeBrowser();
 	}
 
-	public AnnotatedDocument annotate(String text) {
+	public AnnotatedDocument annotate(String text) 
+	{
 		return annotate(new FlatDocument(text));
 	}
 
@@ -134,10 +139,7 @@ public class DexterRestClient {
 	 * @returns an annotated document, containing the annotated text, and a list
 	 *          entities detected.
 	 */
-	public AnnotatedDocument annotate(Document doc) {
-		return annotate(doc, -1);
-
-	}
+	public AnnotatedDocument annotate(Document doc) { return annotate(doc, -1); }
 
 	/**
 	 * Performs the entity linking on a given text, annotating maximum n
@@ -150,13 +152,26 @@ public class DexterRestClient {
 	 * @returns an annotated document, containing the annotated text, and a list
 	 *          entities detected.
 	 */
-	public AnnotatedDocument annotate(Document doc, int n) {
+	public AnnotatedDocument annotate(Document doc, int n) 
+	{
 		String text = "";
 		String json = "";
 		Tagmeta.DocumentFormat format = Tagmeta.DocumentFormat.TEXT;
-		if (doc instanceof FlatDocument) {
-			text = URLEncoder.encode(doc.getContent());
-		} else if (doc instanceof MultifieldDocument) {
+		if (doc instanceof FlatDocument) 
+		{
+			//text = URLEncoder.encode(doc.getContent());
+			try 
+			{
+				text = URLEncoder.encode(doc.getContent(), "UTF-8");
+			} 
+			catch (UnsupportedEncodingException e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} 
+		else if (doc instanceof MultifieldDocument) 
+		{
 			text = gson.toJson(doc);
 			format = Tagmeta.DocumentFormat.JSON;
 		}
@@ -168,15 +183,18 @@ public class DexterRestClient {
 		if (linkProbability > 0)
 			sb.append("&lp=").append(linkProbability);
 
-		if (n > 0) {
+		if (n > 0) 
+		{
 			sb.append("&n=").append(n);
 		}
 
-		if (disambiguator != null) {
+		if (disambiguator != null) 
+		{
 			sb.append("&dsb=").append(disambiguator);
 		}
 
-		if (wikinames) {
+		if (wikinames) 
+		{
 			sb.append("&wn=true");
 		}
 		sb.append("&min-conf=").append(minConfidence);
@@ -186,13 +204,16 @@ public class DexterRestClient {
 		// if (wikinames) {
 		// url += "&wn=true";
 		// }
-		try {
+		try 
+		{
 			// if (n > 0) {
 			// url += "&n=" + n;
 			// }
 			// System.out.println(sb.toString());
 			json = postQuery("annotate", sb.toString());
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			logger.error("cannot call the rest api {}", e.toString());
 			return null;
 		}
@@ -200,15 +221,15 @@ public class DexterRestClient {
 		return adoc;
 	}
 
-	public SpottedDocument spot(String text) {
+	public SpottedDocument spot(String text) 
+	{
 		return spot(new FlatDocument(text));
 	}
 
-	public String getDisambiguator() {
-		return disambiguator;
-	}
+	public String getDisambiguator() { return disambiguator; }
 
-	public void setDisambiguator(String disambiguator) {
+	public void setDisambiguator(String disambiguator) 
+	{
 		this.disambiguator = disambiguator;
 	}
 
@@ -222,12 +243,17 @@ public class DexterRestClient {
 	 *         probability. For each spot it also returns the list of candidate
 	 *         entities associated with it, together with their commonness.
 	 */
-	public SpottedDocument spot(Document doc) {
+	public SpottedDocument spot(Document doc) 
+	{
 		String text = null;
 		Tagmeta.DocumentFormat format = Tagmeta.DocumentFormat.TEXT;
-		if (doc instanceof FlatDocument) {
+		
+		if (doc instanceof FlatDocument) 
+		{
 			text = URLEncoder.encode(doc.getContent());
-		} else if (doc instanceof MultifieldDocument) {
+		} 
+		else if (doc instanceof MultifieldDocument) 
+		{
 			text = URLEncoder.encode(gson.toJson(doc));
 			format = Tagmeta.DocumentFormat.JSON;
 		}
@@ -236,14 +262,18 @@ public class DexterRestClient {
 		StringBuilder sb = new StringBuilder("text=").append(text);
 		if (linkProbability > 0)
 			sb.append("&lp=").append(linkProbability);
-		if (wikinames) {
+		if (wikinames) 
+		{
 			sb.append("&wn=true");
 		}
 		sb.append("&format=" + format);
 		// System.out.println(sb.toString());
-		try {
+		try 
+		{
 			json = postQuery("spot", sb.toString());
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			logger.error("cannot call the rest api {}", e.toString());
 			return null;
 		}
@@ -259,13 +289,17 @@ public class DexterRestClient {
 	 *            the Wiki-id of the entity
 	 * @returns a short description of the entity represented by the Wiki-id
 	 */
-	public ArticleDescription getDesc(int id) {
+	public ArticleDescription getDesc(int id) 
+	{
 
 		String json = "";
-		try {
+		try 
+		{
 			json = browser.fetchAsUTF8String(
 					server.toString() + "/get-desc?id=" + id).toString();
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			logger.error("cannot call the rest api {}", e.toString());
 			return null;
 		}
@@ -280,16 +314,20 @@ public class DexterRestClient {
 	 *            the Wiki-id of the entity
 	 * @returns the entities that link to the given entity
 	 */
-	public ArticleDescription getSourceEntities(int entityId) {
+	public ArticleDescription getSourceEntities(int entityId) 
+	{
 
 		String json = "";
-		try {
+		try 
+		{
 			StringBuffer sb = new StringBuffer(server.toString()
 					+ "/get-source-entities");
 			sb.append("?id=" + entityId);
 			sb.append("&wn=" + String.valueOf(wikinames));
 			json = browser.fetchAsUTF8String(sb.toString()).toString();
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			logger.error("cannot call the rest api {}", e.toString());
 			return null;
 		}
@@ -304,16 +342,20 @@ public class DexterRestClient {
 	 *            the Wiki-id of the entity
 	 * @returns the entities linked by the given entity
 	 */
-	public ArticleDescription getTargetEntities(int entityId) {
+	public ArticleDescription getTargetEntities(int entityId) 
+	{
 
 		String json = "";
-		try {
+		try 
+		{
 			StringBuffer sb = new StringBuffer(server.toString()
 					+ "/get-target-entities");
 			sb.append("?id=" + entityId);
 			sb.append("&wn=" + String.valueOf(wikinames));
 			json = browser.fetchAsUTF8String(sb.toString()).toString();
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			logger.error("cannot call the rest api {}", e.toString());
 			return null;
 		}
@@ -329,10 +371,12 @@ public class DexterRestClient {
 	 * @returns the entities linked by the given entity
 	 */
 	public EntityRelatedness relatedness(int entityId1, int entityId2,
-			String rel) {
+			String rel) 
+	{
 
 		String json = "";
-		try {
+		try 
+		{
 			StringBuffer sb = new StringBuffer(server.toString()
 					+ "/relatedness");
 			sb.append("?e1=" + entityId1);
@@ -340,7 +384,9 @@ public class DexterRestClient {
 			sb.append("&rel=" + rel);
 			sb.append("&wn=" + String.valueOf(wikinames));
 			json = browser.fetchAsUTF8String(sb.toString()).toString();
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			logger.error("cannot call the rest api {}", e.toString());
 			return null;
 		}
@@ -357,17 +403,21 @@ public class DexterRestClient {
 	 *            the label or a redirect title of the entity.
 	 * @returns the wiki-id of the entity
 	 */
-	public int getId(String title) {
+	public int getId(String title) 
+	{
 		title = URLEncoder.encode(title);
 
 		String json = "";
-		try {
+		try 
+		{
 			String url = server.toString() + "/get-id?title="
 					+ URLEncoder.encode(title, "UTF-8");
 			logger.info("featch url {} ", url);
 			json = browser.fetchAsUTF8String(url);
 
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			logger.error("cannot call the rest api {}", e.toString());
 			return -1;
 		}
@@ -375,7 +425,8 @@ public class DexterRestClient {
 		return ad.getId();
 	}
 
-	private String postQuery(String restcall, String params) throws IOException {
+	private String postQuery(String restcall, String params) throws IOException 
+	{
 		HttpURLConnection con = (HttpURLConnection) new URL(server.toString()
 				+ "/" + restcall).openConnection();
 
@@ -396,20 +447,24 @@ public class DexterRestClient {
 		String inputLine;
 		StringBuffer response = new StringBuffer();
 
-		while ((inputLine = in.readLine()) != null) {
+		while ((inputLine = in.readLine()) != null) 
+		{
 			response.append(inputLine);
 		}
 		in.close();
 		return response.toString();
 	}
 
-	public void addParams(String name, String value) {
+	public void addParams(String name, String value) 
+	{
 		params.put(name, value);
 	}
 
-	private String paramsToRequest() {
+	private String paramsToRequest() 
+	{
 		StringBuilder sb = new StringBuilder();
-		for (Map.Entry<String, String> p : params.entrySet()) {
+		for (Map.Entry<String, String> p : params.entrySet()) 
+		{
 			sb.append(p.getKey()).append('=');
 			sb.append(URLEncoder.encode(p.getValue()));
 			sb.append('&');
@@ -417,34 +472,37 @@ public class DexterRestClient {
 		return sb.toString();
 	}
 
-	public Boolean getWikinames() {
-		return wikinames;
-	}
+	public Boolean getWikinames() { return wikinames; }
 
-	public double getLinkProbability() {
-		return linkProbability;
-	}
+	public double getLinkProbability() { return linkProbability; }
 
-	public void setLinkProbability(double linkProbability) {
+	public void setLinkProbability(double linkProbability) 
+	{
 		this.linkProbability = linkProbability;
 	}
 
-	public void setWikinames(Boolean wikinames) {
+	public void setWikinames(Boolean wikinames) 
+	{
 		this.wikinames = wikinames;
 	}
 
-	public List<Integer> getChildCategories(String title) {
+	public List<Integer> getChildCategories(String title) 
+	{
 		return getChildCategories(this.getId(title));
 
 	}
 
-	public List<Integer> getChildCategories(int categoryWikiId) {
+	public List<Integer> getChildCategories(int categoryWikiId) 
+	{
 		String json = "";
-		try {
+		try 
+		{
 			json = browser.fetchAsString(
 					server.toString() + "/get-child-categories?wid="
 							+ categoryWikiId).toString();
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			logger.error("cannot call the rest api {}", e.toString());
 			return Collections.emptyList();
 		}
@@ -453,18 +511,23 @@ public class DexterRestClient {
 
 	}
 
-	public List<Integer> getParentCategories(String title) {
+	public List<Integer> getParentCategories(String title) 
+	{
 		return getParentCategories(this.getId(title));
 
 	}
 
-	public List<Integer> getParentCategories(int categoryWikiId) {
+	public List<Integer> getParentCategories(int categoryWikiId) 
+	{
 		String json = "";
-		try {
+		try 
+		{
 			json = browser.fetchAsString(
 					server.toString() + "/get-parent-categories?wid="
 							+ categoryWikiId).toString();
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			logger.error("cannot call the rest api {}", e.toString());
 			return Collections.emptyList();
 		}
@@ -473,18 +536,23 @@ public class DexterRestClient {
 
 	}
 
-	public List<Integer> getEntityCategories(String title) {
+	public List<Integer> getEntityCategories(String title) 
+	{
 		return getEntityCategories(this.getId(title));
 
 	}
 
-	public List<Integer> getEntityCategories(int entityId) {
+	public List<Integer> getEntityCategories(int entityId) 
+	{
 		String json = "";
-		try {
+		try 
+		{
 			json = browser.fetchAsString(
 					server.toString() + "/get-belonging-entities?wid="
 							+ entityId).toString();
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			logger.error("cannot call the rest api {}", e.toString());
 			return Collections.emptyList();
 		}
@@ -492,18 +560,23 @@ public class DexterRestClient {
 		return categories;
 	}
 
-	public List<Integer> getBelongingEntities(String title) {
+	public List<Integer> getBelongingEntities(String title) 
+	{
 		return getBelongingEntities(this.getId(title));
 
 	}
 
-	public List<Integer> getBelongingEntities(int entityId) {
+	public List<Integer> getBelongingEntities(int entityId) 
+	{
 		String json = "";
-		try {
+		try 
+		{
 			json = browser.fetchAsString(
 					server.toString() + "/get-entity-categories?wid="
 							+ entityId).toString();
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			logger.error("cannot call the rest api {}", e.toString());
 			return Collections.emptyList();
 		}
@@ -511,9 +584,9 @@ public class DexterRestClient {
 		return categories;
 	}
 
-	public static void main(String[] args) throws URISyntaxException {
-		DexterRestClient client = new DexterRestClient(
-				"http://localhost:8080/dexter-webapp/api/rest");
+	public static void main(String[] args) throws URISyntaxException 
+	{
+		DexterRestClient client = new DexterRestClient("http://localhost:8080/dexter-webapp/api/rest");
 		client.setLinkProbability(1);
 
 		// AnnotatedDocument ad = client
@@ -524,21 +597,34 @@ public class DexterRestClient {
 		// System.out.println(gson.toJson(sd));
 
 		MultifieldDocument document = new MultifieldDocument();
-		document.addField(new Field(
-				"q1",
-				"On this day 24 years ago Maradona scored his infamous Hand of God goal against England in the quarter-final of the 1986"));
-		document.addField(new Field("q2", "diego armando maradona"));
+		document.addField(new Field("q1",
+			"On this day 24 years ago Maradona scored his infamous Hand of God goal against England in the quarter-final of the 1986"));
+		
+		//document.addField(new Field("q2", "diego armando maradona"));
 
-		document.addField(new Field("q3", "pablo neruda"));
+		//document.addField(new Field("q3", "pablo neruda"));
 
-		document.addField(new Field("q4", "van gogh"));
-		client.setDisambiguator("tagme");
+		//document.addField(new Field("q4", "van gogh"));
+		//document.addField(new Field("q5", "Del Piero is a Juventus' player."));
+		//document.addField(new Field("qTest", "Dexter is an American television drama series which debuted on Showtime on October 1, 2006. "
+		//		+ "The series centers on Dexter Morgan (Michael C. Hall), a blood spatter pattern analyst for the fictional Miami Metro Police Department "
+		//		+ "(based on the real life Miami-Dade Police Department) who also leads a secret life as a serial killer. Set in Miami, the show's first season was largely based "
+		//	    + "on the novel Darkly Dreaming Dexter, the first of the Dexter series novels by Jeff Lindsay. It was adapted for television by screenwriter James Manos, Jr., who wrote the first episode. "));
+		
+
+		//client.setDisambiguator("tagme");
+		//document.addField(new Field("q", "Michael Jordan is an American retired professional basketball player, businessman, and principal owner and chairman of the Charlotte Hornets."));
+		//document.addField(new Field ("q6", "President Barack Obama met Angela Merkel in Berlin, yesterday"));
+		
+		//MODIFICA
+		client.setDisambiguator("genetic");
+		
+		
 		client.setLinkProbability(0.03);
 		client.setWikinames(true);
 
 		AnnotatedDocument sd = client.annotate(document);
-		System.out.println(new GsonBuilder().setPrettyPrinting().create()
-				.toJson(sd));
+		System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(sd));
 
 		// // FIXME belonging entities does not work, probably I changed
 		// something
@@ -552,11 +638,11 @@ public class DexterRestClient {
 
 	}
 
-	public double getMinConfidence() {
-		return minConfidence;
-	}
+	public double getMinConfidence() { return minConfidence; }
 
-	public void setMinConfidence(double minConfidence) {
+	public void setMinConfidence(double minConfidence) 
+	{
 		this.minConfidence = minConfidence;
 	}
+	
 }

@@ -17,11 +17,15 @@ package it.cnr.isti.hpc.dexter;
 
 import it.cnr.isti.hpc.benchmark.Stopwatch;
 import it.cnr.isti.hpc.dexter.common.Document;
+import it.cnr.isti.hpc.dexter.common.Field;
 import it.cnr.isti.hpc.dexter.disambiguation.Disambiguator;
 import it.cnr.isti.hpc.dexter.disambiguation.TopScoreEntityDisambiguator;
+import it.cnr.isti.hpc.dexter.entity.Entity;
+import it.cnr.isti.hpc.dexter.entity.EntityMatch;
 import it.cnr.isti.hpc.dexter.entity.EntityMatchList;
 import it.cnr.isti.hpc.dexter.relatedness.MilneRelatedness;
 import it.cnr.isti.hpc.dexter.relatedness.Relatedness;
+import it.cnr.isti.hpc.dexter.spot.Spot;
 import it.cnr.isti.hpc.dexter.spot.SpotMatch;
 import it.cnr.isti.hpc.dexter.spot.SpotMatchList;
 import it.cnr.isti.hpc.dexter.spotter.DictionarySpotter;
@@ -145,19 +149,51 @@ public class StandardTagger implements Tagger {
 
 		stopwatch.start("spotting");
 		SpotMatchList sml = spotter.match(localParams, doc);
+		
+		/*
+		 * TEST !!!!!!!!!!!!!!
+		 */
+		sml.sort(null);
+		System.out.println("Vediamo il contenuto dopo la fase di SPOTTING");
+		for( SpotMatch sm: sml)
+		{
+			Spot spotTemp = sm.getSpot();
+			Field f = sm.getField();
+			int id = f.getId();
+			System.out.println("ID: " + id );
+			System.out.println("Menzione: " + spotTemp.getMention());
+			System.out.println("Entità candidate:");
+			EntityMatchList candidate = sm.getEntities();
+			for (EntityMatch em : candidate)
+			{
+				Entity ent = em.getEntity();
+				System.out.println(ent.getId());
+			}
+			System.out.println("");
+		}
+		
+		System.out.println("Fine analisi contenuto SpotMatchList alla fine dello spotting.");
+		
+		/*
+		 * FINE
+		 */
 
-		logger.info("spotting performed in {} millis",
-				stopwatch.stop("spotting"));
+		//logger.info("spotting performed in {} millis",
+			//	stopwatch.stop("spotting"));
+		System.out.println("Spotting performed in " + stopwatch.stop("spotting") + " millis");
 
 		stopwatch.start("disambiguation");
 		EntityMatchList eml = disambiguator.disambiguate(localParams, sml);
 		if (!eml.isEmpty()) {
 			eml = eml.removeOverlappings();
 		} else {
-			logger.warn("no spot identified in text");
+			//logger.warn("no spot identified in text");
+			System.out.println("no spot identified in text");
 		}
-		logger.info("disambiguation performed in {} millis",
-				stopwatch.stop("disambiguation"));
+		//logger.info("disambiguation performed in {} millis",
+			//stopwatch.stop("disambiguation"));
+		System.out.println("Disambiguation performed in " + stopwatch.stop("disambiguation") + " millis");
+		
 		return eml;
 
 	}
