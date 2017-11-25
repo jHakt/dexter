@@ -16,6 +16,8 @@
 package it.cnr.isti.hpc.dexter.spot.ram;
 
 import it.cnr.isti.hpc.benchmark.Stopwatch;
+import it.cnr.isti.hpc.dexter.label.IdHelper;
+import it.cnr.isti.hpc.dexter.label.IdHelperFactory;
 import it.cnr.isti.hpc.dexter.spot.Spot;
 import it.cnr.isti.hpc.dexter.spot.repo.SpotRepository;
 
@@ -87,9 +89,13 @@ public class RamSpotRepository implements SpotRepository {
 		RamSpotRepository rs = new RamSpotRepository();
 		Stopwatch s = new Stopwatch();
 		s.start("spot");
-		Spot spot = rs.getSpot("glass");
+		//Spot spot = rs.getSpot("glass");
+		//Spot spot = rs.getSpot("gunners");
 		s.stop("spot");
-		// System.out.println(spot);
+		//System.out.println(spot);
+		
+		IdHelper helper = IdHelperFactory.getStdIdHelper();
+		System.out.println(helper.getLabel(4224));
 		// System.out.println("retrieved: "+s.stat("spot"));
 
 	}
