@@ -20,6 +20,7 @@ import it.cnr.isti.hpc.dexter.entity.Entity;
 import it.cnr.isti.hpc.dexter.entity.EntityMatch;
 import it.cnr.isti.hpc.dexter.entity.EntityMatchList;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -42,14 +43,18 @@ import java.util.List;
  * 
  * @author Diego Ceccarelli, diego.ceccarelli@isti.cnr.it
  */
-public class SpotMatch implements Comparable<SpotMatch> {
+public class SpotMatch implements Comparable<SpotMatch>, Cloneable 
+{
 
 	protected Spot spot;
 	protected EntityMatchList entities;
 	protected Field field;
-
 	private int start;
 	private int end;
+	private boolean inClone = false;
+	
+	
+	private SpotMatch() {}
 
 	public SpotMatch(Spot spot) {
 		this.spot = spot;
@@ -68,7 +73,7 @@ public class SpotMatch implements Comparable<SpotMatch> {
 		this(spot);
 		this.entities = new EntityMatchList();
 		for (Entity e : entities) {
-			this.entities.add(new EntityMatch(e.clone(), spot
+			this.entities.add(new EntityMatch((Entity)e.clone(), spot
 					.getEntityCommonness(e), this));
 		}
 
@@ -157,6 +162,8 @@ public class SpotMatch implements Comparable<SpotMatch> {
 	public Spot getSpot() {
 		return spot;
 	}
+	
+	public boolean getBoolClone() { return inClone; }
 
 	@Override
 	public int hashCode() {
@@ -246,6 +253,30 @@ public class SpotMatch implements Comparable<SpotMatch> {
 
 	public double getLinkProbability() {
 		return spot.getLinkProbability();
+	}
+	
+	@Override
+	public Object clone()
+	{
+		SpotMatch sm = new SpotMatch();
+		sm.spot = (Spot)this.spot.clone();
+		sm.field = (Field)this.field.clone();
+		sm.start = this.start;
+		sm.end = this.end;
+		
+		if(this.entities != null)
+		{
+			sm.entities = new EntityMatchList();
+			for (Iterator<EntityMatch> it = this.entities.iterator(); it.hasNext(); )
+			{
+				EntityMatch em = it.next();
+				EntityMatch copy = (EntityMatch)em.clone();
+				copy.setSpot(sm);
+				sm.entities.add(copy);
+			}
+		}
+		
+		return sm;
 	}
 
 }

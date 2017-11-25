@@ -32,7 +32,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Diego Ceccarelli, diego.ceccarelli@isti.cnr.it
  */
-public class Entity implements Comparable<Entity>, Serializable {
+public class Entity implements Comparable<Entity>, Serializable, Cloneable
+{
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LoggerFactory.getLogger(Entity.class);
@@ -112,12 +113,11 @@ public class Entity implements Comparable<Entity>, Serializable {
 		return o.frequency - frequency;
 	}
 
-	/**
-	 * @return a copy of this entity
-	 */
+	/*
 	public Entity clone() {
 		return new Entity(id, frequency);
 	}
+	*/
 
 	@Override
 	public int hashCode() {
@@ -140,4 +140,13 @@ public class Entity implements Comparable<Entity>, Serializable {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public Object clone()
+	{
+		Entity e = new Entity(this.id, this.frequency);
+		
+		return e;
+	}
+
 }

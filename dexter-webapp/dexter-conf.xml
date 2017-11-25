@@ -146,6 +146,11 @@
 				</filter>
 			</filters>
 		</spotter>
+		<!-- AGGIUNTA SPOTTER -->
+		<spotter>
+			<name>nif</name>
+			<class>it.cnr.isti.hpc.dexter.spotter.NifSpotter</class>
+		</spotter>
 	</spotters>
 	<taggers>
 		<default>dexter</default>

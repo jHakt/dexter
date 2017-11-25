@@ -8,7 +8,8 @@ import java.io.Serializable;
  * 
  * @author Salvatore Trani, salvatore.trani@isti.cnr.it
  */
-public class Field implements Serializable {
+public class Field implements Serializable, Cloneable 
+{
 	private static final long serialVersionUID = 1L;
 	private String name;
 	private String value;
@@ -24,6 +25,8 @@ public class Field implements Serializable {
 		this.id = idFieldCount;
 		idFieldCount++;
 	}
+	
+	private Field() {}
 
 	public int getId() { return id; }
 	
@@ -66,6 +69,17 @@ public class Field implements Serializable {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+	
+	@Override
+	public Object clone()
+	{
+		Field f = new Field();
+		f.id = this.id;
+		f.name = new String(this.name);
+		f.value = new String(this.value);
+		
+		return f;
 	}
 
 }

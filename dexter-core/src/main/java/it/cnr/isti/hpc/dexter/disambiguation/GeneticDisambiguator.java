@@ -2,7 +2,6 @@ package it.cnr.isti.hpc.dexter.disambiguation;
 
 import java.util.ArrayList;
 import java.util.Random;
-
 import genetic.Chromosome;
 import genetic.Gene;
 import genetic.Population;
@@ -28,89 +27,105 @@ public class GeneticDisambiguator implements Disambiguator
 	@Override
 	public EntityMatchList disambiguate(DexterLocalParams requestParams, SpotMatchList sml) 
 	{
+		
+		int smlSize = sml.size();
+		
 		//EntityMatchList eml = new EntityMatchList();
 		/*
 		 * Parte iniziale: ordino tutte le entità candidate per ogni spot (menzione)
 		 * in base a uno score/probabilità a priori.
 		 */
-		//for (SpotMatch sm : sml)
-		//{
-			//EntityMatchList order = sm.getEntities();
-			//order.sort();
-		//}
-		
-		// Bisogna costruire la popolazione iniziale
-		Population gen_0 = constructPopulation(sml);
-		Population prev = gen_0;
-		
-		//Parametri dell'algoritmo
-		double probCross = 0.7;
-		double probMut = 0.1;
-		int gen = 0;
-		int maxGen = 10;
-		double ra = 1;
-		double rb = 0;
-		double threshold = 0.6;
-		int dimMaxPop = gen_0.getMaxPopDim();
-		
-		//Per la popolazione iniziale
-		calculateAnnealedFitness(prev, ra, rb);
-		prev.best();
-		
-		//Effettuiamo una stampa della popolazione iniziale
-		//System.out.println("Generazione: " + gen + "\n" + gen_0);
-		
-		//L'algoritmo termina quando si raggiunge il numero massimo di generazioni oppure 
-		//quando si supera un criterio di soglia.
-		while(gen < maxGen) //|| threshold <= prev.getBestFitness()))
+		for (SpotMatch sm : sml)
 		{
-			//Calcola la fitness
-			//ra -= (1 / maxGen);
-			//rb += (1 / maxGen);
-			//calculateAnnealedFitness(prev, ra, rb);
-			
-			Population gen_i = new Population(dimMaxPop);
-			
-			//La nuova popolazione è vuota, dalla precedente estraggo i due migliori individui e li inserisco
-			Chromosome best1 = prev.getBestChromosome();
-			gen_i.addToPopulation(best1);
-			
-			Chromosome best2 = prev.getSecondBestChromosome();
-			gen_i.addToPopulation(best2);
-			
-			//System.out.println("Popolazione Generazione " + (gen + 1) + "Parziale: ");
-			//System.out.println(gen_i);
-			
-			selection(prev, dimMaxPop-2); // -2 perché ho aggiunto i due migliori della popolazione precedente
-			while (matingPool.size() > 0)
-			{
-				ArrayList<Chromosome> offspring = crossover(probCross, matingPool.size());
-				mutation(offspring, probMut);
-				
-				//Aggiungiamo alla popolazione i due individui
-				gen_i.addToPopulation(offspring.get(0));
-				gen_i.addToPopulation(offspring.get(1));
-			}
-			
-			//Calcola la fitness
-			ra -= (1 / maxGen);
-			rb += (1 / maxGen);
-			calculateAnnealedFitness(gen_i, ra, rb);
-			gen_i.best();
-		
-			
-			//LA generazione appena creata è la precendente nel prossimo ciclo
-			prev = gen_i;
-			
-			gen++;
-			
-			//Stampiamo la popolazione della generazione del ciclo successivo
-			//System.out.println("Generazione: " + gen + "\n" + prev);
+			EntityMatchList order = sm.getEntities();
+			order.sort();
 		}
 		
-		Chromosome bestC = prev.getBestChromosome();
-		//Avvolorare eml con le informazioni contenute nel miglior cromosoma finale
-		EntityMatchList eml = validate(bestC, sml);
+		EntityMatchList eml = null;
+		if ( !(smlSize == 1) )
+		{
+			// Bisogna costruire la popolazione iniziale
+			Population gen_0 = constructPopulation(sml);
+			Population prev = gen_0;
+		
+			//Parametri dell'algoritmo
+			double probCross = 0.8;
+			double probMut = 0.6;
+			int gen = 0;
+			int maxGen = 35;
+			double ra = 1;
+			double rb = 0;
+			//double threshold = 0.6;
+			int dimMaxPop = gen_0.getMaxPopDim();
+			 
+			//fitness migliore nelle ultime due generazioni
+			//double bestFit1 = 0.0;
+			//double bestFit2 = 0.0;
+		
+			//Per la popolazione iniziale
+			calculateAnnealedFitness(prev, ra, rb);
+			prev.best();
+			
+			//bestFit1 = prev.getBestFitness();
+		
+			//Effettuiamo una stampa della popolazione iniziale
+			//System.out.println("Generazione: " + gen + "\n" + gen_0);
+		
+			//L'algoritmo termina quando si raggiunge il numero massimo di generazioni oppure 
+			//quando si supera un criterio di soglia.
+			while(gen < maxGen) //|| threshold <= prev.getBestFitness()))
+			{	
+				Population gen_i = new Population(dimMaxPop);
+			
+				//La nuova popolazione è vuota, dalla precedente estraggo i due migliori individui e li inserisco
+				Chromosome best1 = prev.getBestChromosome();
+				gen_i.addToPopulation(best1);
+			
+				Chromosome best2 = prev.getSecondBestChromosome();
+				gen_i.addToPopulation(best2);
+			
+				//System.out.println("Popolazione Generazione " + (gen + 1) + "Parziale: ");
+				//System.out.println(gen_i);
+			
+				selection(prev, dimMaxPop-2); // -2 perché ho aggiunto i due migliori della popolazione precedente
+				while (matingPool.size() > 0)
+				{
+					ArrayList<Chromosome> offspring = crossover(probCross, matingPool.size());
+					mutation(offspring, probMut);
+				
+					//Aggiungiamo alla popolazione i due individui
+					gen_i.addToPopulation(offspring.get(0));
+					gen_i.addToPopulation(offspring.get(1));
+				}	
+			
+				//Calcola la fitness
+				ra -= (1 / maxGen);
+				rb += (1 / maxGen);
+				probMut -= (0.5 / maxGen);
+				calculateAnnealedFitness(gen_i, ra, rb);
+				gen_i.best();
+		
+				//LA generazione appena creata è la precendente nel prossimo ciclo
+				prev = gen_i;		
+				gen++;
+
+				//Stampiamo la popolazione della generazione del ciclo successivo
+				//System.out.println("Generazione: " + gen + "\n" + prev);
+			}
+		
+			Chromosome bestC = prev.getBestChromosome();
+			//Avvolorare eml con le informazioni contenute nel miglior cromosoma finale
+			eml = validate(bestC, sml);
+		}
+		else
+		{
+			SpotMatch sm = sml.get(0);
+			EntityMatchList candidate = sm.getEntities();
+			EntityMatch mostProb = candidate.get(0);
+			mostProb.setScore(0.5);
+			eml = new EntityMatchList();
+			eml.add(mostProb);
+		}
 		
 		return eml;
 	}
@@ -145,10 +160,10 @@ public class GeneticDisambiguator implements Disambiguator
 			dimBinGenes.add(sizeBin);
 		}
 		
-		//GRANDEZZA POPOLAZIONE ADATTIVA, se > 50 viene settata a 50 (caso Raro)
+		//GRANDEZZA POPOLAZIONE ADATTIVA, se > 100 viene settata a 100 (caso Raro)
 		int sizePop = max * 2;
-		if (sizePop > 50)
-			sizePop = 50;
+		if (sizePop > 100)
+			sizePop = 100;
 		
 		Population population = new Population(sizePop);
 		//int sizeMax = population.getMaxPopDim();
@@ -199,46 +214,34 @@ public class GeneticDisambiguator implements Disambiguator
 	{
 		Random random = new Random();
 		ArrayList<Chromosome> offspring;
-		
-		//int sizeMPool = matingPool.size();
-		//while(sizeMPool > 0)
-		//{
 			
-			int rand1 = random.nextInt(matingPoolSize);
-			//matingPoolSize--;
+		int rand1 = random.nextInt(matingPoolSize);
 			
-			int rand2 = random.nextInt(matingPoolSize);
-			while(rand2 == rand1)
-			{
-				rand2 = random.nextInt(matingPoolSize);
-			}
-			//matingPoolSize--;
-			
-			if (rand1 < rand2)
-				rand2--;
+		int rand2 = random.nextInt(matingPoolSize);
+		while(rand2 == rand1)
+		{
+			rand2 = random.nextInt(matingPoolSize);
+		}
+
+		if (rand1 < rand2)
+			rand2--;
 			
 			
-			Chromosome parent1 = matingPool.remove(rand1);
-			Chromosome parent2 = matingPool.remove(rand2);
+		Chromosome parent1 = matingPool.remove(rand1);
+		Chromosome parent2 = matingPool.remove(rand2);
 			
-			double cross = random.nextDouble();
-			if (cross <= probCross)
-			{
-				//CrossOver
-				offspring = Population.crossover(parent1, parent2);
-				//newGen.addToPopulation(offspring.get(0));
-				//newGen.addToPopulation(offspring.get(1));
-			}
-			else
-			{
-				//newGen.addToPopulation(parent1);
-				//newGen.addToPopulation(parent2);
-				offspring = new ArrayList<Chromosome>();
-				offspring.add(parent1);
-				offspring.add(parent2);
-			}
-		
-		//}
+		double cross = random.nextDouble();
+		if (cross <= probCross)
+		{
+			//CrossOver
+			offspring = Population.crossover(parent1, parent2);
+		}
+		else
+		{		
+			offspring = new ArrayList<Chromosome>();
+			offspring.add(parent1);
+			offspring.add(parent2);
+		}
 			
 		return offspring;
 		
@@ -251,6 +254,7 @@ public class GeneticDisambiguator implements Disambiguator
 	
 	private EntityMatchList validate(Chromosome best, SpotMatchList sml)
 	{
+		
 		EntityMatchList eml = new EntityMatchList();
 		int index = 0;
 		

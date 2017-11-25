@@ -136,7 +136,12 @@
 			<version>3.2.6</version>
 		</dependency>
 
-
+		<!-- Similarity -->
+		<dependency>
+    		<groupId>info.debatty</groupId>
+   			 <artifactId>java-string-similarity</artifactId>
+    		<version>RELEASE</version>
+		</dependency>
 
 
 	</dependencies>

@@ -45,6 +45,9 @@ public class Gene implements Cloneable
 		
 	}
 	
+	public Gene(int pos) { this.pos = pos; }
+	
+	//Private for copy
 	private Gene() { }
 
 	//Getters and setters
@@ -59,11 +62,18 @@ public class Gene implements Cloneable
 
 	public int getValue() { return value; }
 
-	void setValue(int value) { this.value = value; }
+	public void setValue(int value) { this.value = value; }
 	
 	ArrayList<Integer> getBinary() { return binary; }
 	
-	void setBinary(ArrayList<Integer> binary) { this.binary = binary; }
+	void setBinary(ArrayList<Integer> binary) 
+	{ 
+		this.binary = binary; 
+		
+		if(this.binary.size() < maxDimBin)
+			autoCompleteBinary();
+		
+	}
 	
 	//CROSSOver tra geni
 	static void crossoverGenes(Gene gene1, Gene gene2)
@@ -77,30 +87,94 @@ public class Gene implements Cloneable
 		ArrayList<Integer> bin2 = new ArrayList<Integer>();
 		
 		int sizeBin = binG1.size();
-		for( int i = 0; i < sizeBin; i++ )
+		//int crossType = random.nextInt(2);
+		
+		//CrossOver Standard uniforme
+		/*
+		if (crossType == 0)
 		{
-			Integer n1 = binG1.get(i);
-			Integer n2 = binG2.get(i);
-			
-			int rand = random.nextInt(2);
-			if (rand == 0)
+		*/
+			for( int i = 0; i < sizeBin; i++ )
 			{
+				Integer n1 = binG1.get(i);
+				Integer n2 = binG2.get(i);
+			
+				int rand = random.nextInt(2);
+				if (rand == 0)
+				{
+					bin1.add(n1);
+					bin2.add(n2);
+				}
+				else
+				{
+					bin1.add(n2);
+					bin2.add(n1);
+				}
+			
+			}
+		/*}
+		else
+		{
+			//Nuovo CrossOver
+			
+			for( int i = 0; i < sizeBin; i++ )
+			{
+				Integer n1 = binG1.get(i);
+				Integer n2 = binG2.get(i);
+				
+				if (n1 == 0 && n2 == 1)
+				{
+					n1 = new Integer(random.nextInt(2));
+					n2 = new Integer(random.nextInt(2));
+				}
+				else if (n1 == 1 && n2 == 0)
+				{
+					n1 = new Integer(1);
+					n2 = new Integer(1);
+				}
+				else if (n1 == 0 && n2 == 0)
+				{
+					int rN1 = random.nextInt(2);
+					
+					if (rN1 == 1)
+					{
+						n1 = new Integer(rN1);
+					}
+					else
+					{
+						n2 = new Integer(random.nextInt(2));
+					}
+				}
+				else
+				{
+					//Caso in cui entrambi 1
+					n1 = new Integer(0);
+					n2 = new Integer(0);
+				}
+				
 				bin1.add(n1);
 				bin2.add(n2);
-			}
-			else
-			{
-				bin1.add(n2);
-				bin2.add(n1);
+
 			}
 			
-		}
+		} */
 		
+		//Seconda Modifica CrossOver
 		int binDec = Binary.listBinToInt(bin1);
 		if(binDec > gene1.maxValue)
 		{
-			binDec = gene1.maxValue;
+			//binDec = gene1.maxValue;
+			//System.out.println("\n MaxValue: " + gene1.maxValue + "\n");
+			int rand = random.nextInt(2);
+			if (gene1.maxValue == 0)
+				binDec = gene1.maxValue;
+			else if (rand == 0)
+				binDec = gene1.maxValue;
+			else
+				binDec = random.nextInt(gene1.maxValue);
+			
 			bin1 = Binary.intToBinary(binDec);
+				
 		}
 		gene1.setBinary(bin1);
 		gene1.setValue(binDec);
@@ -108,7 +182,16 @@ public class Gene implements Cloneable
 		binDec = Binary.listBinToInt(bin2);
 		if(binDec > gene2.maxValue)
 		{
-			binDec = gene2.maxValue;
+			//binDec = gene2.maxValue;
+			//System.out.println("\n MaxValue: " + gene1.maxValue + "\n");
+			int rand = random.nextInt(2);
+			if (gene2.maxValue == 0)
+				binDec = gene1.maxValue;
+			else if (rand == 0)
+				binDec = gene2.maxValue;
+			else
+				binDec = random.nextInt(gene2.maxValue);
+			
 			bin2 = Binary.intToBinary(binDec);
 		}
 		gene2.setBinary(bin2);

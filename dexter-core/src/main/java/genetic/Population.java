@@ -169,6 +169,10 @@ public class Population implements Iterable<Chromosome>
 		for (Chromosome c : this.population)
 		{
 			double norm = c.getFitness() / sumFitness;
+			if (Double.isNaN(norm))
+			{
+				norm = 0;
+			}
 			c.setNormFitness(norm);
 		}
 		
@@ -222,39 +226,11 @@ public class Population implements Iterable<Chromosome>
 			Gene new1 = (Gene) old1.clone();
 			Gene new2 = (Gene) old2.clone();
 			
-			/*
-			if (temp1.getAverageFitness() >= temp2.getAverageFitness())
-			{
-				genesOff1.add(temp1);
-				genesOff2.add(temp2);
-			}
-			else
-			{
-				genesOff1.add(temp2);
-				genesOff2.add(temp1);
-			}*/
-			
-			/*
-			int genRand = random.nextInt(2);
-			if (genRand == 0)
-			{
-				genesOff1.add(temp1);
-				genesOff2.add(temp2);
-			}
-			else
-			{
-				genesOff1.add(temp2);
-				genesOff2.add(temp1);
-			} */
-			
 			Gene.crossoverGenes(new1, new2);
 			genesOff1.add(new1);
 			genesOff2.add(new2);
 			
 		}
-		
-		off1.setFitness(off1.calculateFitness());
-		off2.setFitness(off2.calculateFitness());
 		
 		newOffspring.add(off1);
 		newOffspring.add(off2);
@@ -265,17 +241,18 @@ public class Population implements Iterable<Chromosome>
 	public static void mutation(ArrayList<Chromosome> offspring, double probMutation)
 	{
 		Random random = new Random();
+		boolean change = false;
 		
 		double rand = random.nextDouble();
 		if (rand <= probMutation)
 		{
 			//Viene mutato il primo elemento di offspring
 			Chromosome off1 = offspring.get(0);
-			//SpotMatchList sml = off1.getSpotMatchList();
 			for (Gene g : off1)
 			{
 				if (g.getAverageFitness() < 0.5)
 				{
+					change = true;
 					/*
 					int pos = g.getPos();
 					SpotMatch sm = sml.get(pos);
@@ -288,52 +265,42 @@ public class Population implements Iterable<Chromosome>
 				}
 			}
 			
+			if(change == true)
+			{
+				off1.setFitness(off1.calculateFitness());
+			}
+			
 		}
 		
+		change = false;
 		rand = random.nextDouble();
 		if (rand <= probMutation)
 		{
 			//Viene mutato il secondo elemento di offspring
 			Chromosome off2 = offspring.get(1);
-			//SpotMatchList sml = off2.getSpotMatchList();
 			for (Gene g : off2)
 			{
 				if (g.getAverageFitness() < 0.5)
 				{
-					/*
-					int pos = g.getPos();
-					SpotMatch sm = sml.get(pos);
-					EntityMatchList eml = sm.getEntities();
-					int valueRandom = random.nextInt(eml.size());
-					
-					g.setValue(valueRandom);
-					*/
+					change = true;
 					g.mutationGene();
 				}
+			}
+			
+			if (change == true)
+			{
+				off2.setFitness(off2.calculateFitness());
 			}
 		}
 		
 	}
 	
-	//RIVEDERE BENE L'UTILITA' DI FARE UN CICLO
 	public void best()
 	{
-		/* 
-		for (Chromosome c : population)
-		{
-			if (c.getFitness() > bestFitness)
-			{
-				bestFitness = c.getFitness();
-				bestChromosome = c;
-			}
-		}
-		*/
-		
 		int popSize = population.size();
 		this.bestChromosome = population.get(popSize - 1);
 		this.bestFitness = bestChromosome.getFitness();
-		this.secondBestChromosome = population.get(popSize - 2); 
-		
+		this.secondBestChromosome = population.get(popSize - 2); 	
 	}
 	
 }

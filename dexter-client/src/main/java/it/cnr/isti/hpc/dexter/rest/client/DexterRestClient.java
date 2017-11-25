@@ -89,6 +89,8 @@ public class DexterRestClient
 
 	Map<String, String> params = new HashMap<String, String>();
 
+	private String spotter = null;
+	
 	private String disambiguator = null;
 
 	public double linkProbability = -1;
@@ -187,6 +189,11 @@ public class DexterRestClient
 		{
 			sb.append("&n=").append(n);
 		}
+		
+		if (spotter != null)
+		{
+			sb.append("&spt=").append(spotter);
+		}
 
 		if (disambiguator != null) 
 		{
@@ -226,6 +233,9 @@ public class DexterRestClient
 		return spot(new FlatDocument(text));
 	}
 
+	public String getSpotter() { return spotter; }
+	public void setSpotter(String spotter) { this.spotter = spotter; }
+	
 	public String getDisambiguator() { return disambiguator; }
 
 	public void setDisambiguator(String disambiguator) 
@@ -597,19 +607,26 @@ public class DexterRestClient
 		// System.out.println(gson.toJson(sd));
 
 		MultifieldDocument document = new MultifieldDocument();
-		document.addField(new Field("q1",
-			"On this day 24 years ago Maradona scored his infamous Hand of God goal against England in the quarter-final of the 1986"));
+		//document.addField(new Field("q1",
+			//"On this day 24 years ago Maradona scored his infamous Hand of God goal against England in the quarter-final of the 1986"));
+		//document.addField(new Field("q1", "maradona:25,33;hand of god goal:54,70;england:79,86;"));
 		
-		//document.addField(new Field("q2", "diego armando maradona"));
+		document.addField(new Field("q1", "hurricane:16,25;desire:73,79;carter:50,56;dylan:0,5;"));
+		//document.addField(new Field("q1", "oakland:557,564;cincinnati:1000,1010;texas:715,720;central division:367,383;boston:294,300;chicago:1023,1030;western division:1067,1083;chicago:1216,1223;colorado:1344,1352;philadelphia:912,924;montreal:1259,1267;american league eastern division:207,239;seattle:775,782;houston:955,962;national league eastern division:783,815;kansas city:477,488;baltimore:762,771;texas:519,524;toronto:317,324;san diego:1246,1255;st louis:1356,1364;pittsburgh:1043,1053;pittsburgh:1307,1317;major league baseball:78,99;philadelphia:1283,1295;colorado:1130,1138;detroit:342,349;milwaukee:692,701;minnesota:679,688;montreal:847,855;los angeles:1106,1117;cleveland:702,711;cleveland:384,393;california:733,743;san diego:1084,1093;houston:1296,1303;florida:869,876;st louis:975,983;milwaukee:454,463;new york:721,729;atlanta:827,834;new york:251,259;new york:1335,1343;seattle:537,544;san francisco:1151,1164;new york:890,898;atlanta:1205,1212;baltimore:272,281;toronto:671,678;florida:1224,1231;san francisco:1318,1331;major league:11,23;oakland:754,761;western division:502,518;boston:744,750;new york:58,66;kansas city:637,648;central division:938,954;chicago:406,413;minnesota:427,436;cincinnati:1235,1245;chicago:660,667;los angeles:1268,1279;california:582,592;detroit:652,659;"));
+		//document.addField(new Field("q1", "irish:310,315;republic of ireland:510,529;charlton:417,425;jack charlton:77,90;charlton:699,707;ireland:274,281;charlton:20,28;bobby:1381,1386;germany:1094,1101;charlton:843,851;england:1238,1245;1966 world cup:1327,1341;ireland:640,647;englishman:167,177;charlton:220,228;englishman:9,19;ireland:125,132;dublin:59,65;irish:1113,1118;ireland:860,867;european:1062,1070;ireland:991,998;world cup:1017,1026;dick spring:353,364;peggy:248,253;irishman:49,57;leeds united:1199,1211;england:1139,1146;"));
+	    //document.addField(new Field("q2", "While Apple is an electronics company, Mango is a clothing one and Orange is a communication one."));
 
 		//document.addField(new Field("q3", "pablo neruda"));
 
 		//document.addField(new Field("q4", "van gogh"));
+		
+		//document.addField(new Field("q4", "Angelina, her father Jon, and her partner Brad never played together in the same movie."));
+		
 		//document.addField(new Field("q5", "Del Piero is a Juventus' player."));
 		//document.addField(new Field("qTest", "Dexter is an American television drama series which debuted on Showtime on October 1, 2006. "
-		//		+ "The series centers on Dexter Morgan (Michael C. Hall), a blood spatter pattern analyst for the fictional Miami Metro Police Department "
-		//		+ "(based on the real life Miami-Dade Police Department) who also leads a secret life as a serial killer. Set in Miami, the show's first season was largely based "
-		//	    + "on the novel Darkly Dreaming Dexter, the first of the Dexter series novels by Jeff Lindsay. It was adapted for television by screenwriter James Manos, Jr., who wrote the first episode. "));
+			//	+ "The series centers on Dexter Morgan (Michael C. Hall), a blood spatter pattern analyst for the fictional Miami Metro Police Department "
+			//	+ "(based on the real life Miami-Dade Police Department) who also leads a secret life as a serial killer. Set in Miami, the show's first season was largely based "
+			 //   + "on the novel Darkly Dreaming Dexter, the first of the Dexter series novels by Jeff Lindsay. It was adapted for television by screenwriter James Manos, Jr., who wrote the first episode. "));
 		
 
 		//client.setDisambiguator("tagme");
@@ -617,6 +634,7 @@ public class DexterRestClient
 		//document.addField(new Field ("q6", "President Barack Obama met Angela Merkel in Berlin, yesterday"));
 		
 		//MODIFICA
+		client.setSpotter("nif");
 		client.setDisambiguator("genetic");
 		
 		

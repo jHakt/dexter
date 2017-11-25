@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Diego Ceccarelli, diego.ceccarelli@isti.cnr.it created on 06/ago/2012
  */
-public class EntityMatch implements Comparable<EntityMatch> {
+public class EntityMatch implements Comparable<EntityMatch>, Cloneable {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(EntityMatch.class);
@@ -40,7 +40,11 @@ public class EntityMatch implements Comparable<EntityMatch> {
 
 	/** the confidence score of the match */
 	private double score;
+	
+	private boolean inClone = false;
 
+	private EntityMatch() {}
+	
 	private EntityMatch(Entity e, double score) {
 		super();
 		this.entity = new Entity(e.getId(), e.getFrequency());
@@ -120,6 +124,8 @@ public class EntityMatch implements Comparable<EntityMatch> {
 	public void setEntity(Entity entity) {
 		this.entity = entity;
 	}
+	
+	public boolean getBoolClone() { return inClone; }
 
 	public static class SortByPosition implements Comparator<EntityMatch> {
 
@@ -250,4 +256,21 @@ public class EntityMatch implements Comparable<EntityMatch> {
 		// .getEnd()));
 		// return endOverlap;
 	}
+	
+	@Override
+	public Object clone()
+	{
+		EntityMatch em = new EntityMatch();
+		em.entity = (Entity)this.entity.clone();
+		em.score = this.score;
+		em.spot = this.spot;
+		//if(this.spot != null)
+		//{
+			//em.spot = (SpotMatch)this.spot.clone();
+		//}
+		
+		return em;
+	}
+	
+	
 }

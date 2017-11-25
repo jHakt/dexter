@@ -26,6 +26,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -49,7 +50,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Diego Ceccarelli, diego.ceccarelli@isti.cnr.it
  */
-public class Spot implements Serializable {
+public class Spot implements Serializable, Cloneable
+{
 
 	private static final long serialVersionUID = 1L;
 
@@ -114,6 +116,11 @@ public class Spot implements Serializable {
 		updateIdf();
 		logger.debug("spot [{}] IDF = {}", spot, idf);
 	}
+	
+	/**
+	 * Costruttore privato
+	 */
+	private Spot() {}
 
 	/**
 	 * Returns the document frequency of this spot, i.e., how many wikipedia
@@ -485,6 +492,7 @@ public class Spot implements Serializable {
 	/**
 	 * Returns a copy of this object
 	 */
+	/*
 	@Override
 	public Spot clone() {
 		Spot copy = new Spot(mention);
@@ -495,6 +503,7 @@ public class Spot implements Serializable {
 		copy.setFrequency(freq);
 		return copy;
 	}
+	*/
 
 	@Override
 	public boolean equals(Object obj) {
@@ -539,4 +548,26 @@ public class Spot implements Serializable {
 			return spot.toTsv();
 		}
 	}
+	
+	@Override
+	public Object clone()
+	{
+		Spot s = new Spot();
+		s.mention = new String(this.mention);
+		s.freq = this.freq;
+		s.link = this.link;
+		s.entities = new ArrayList<Entity>();
+		for (Iterator<Entity> it = this.entities.iterator(); it.hasNext(); )
+		{
+			Entity e = it.next();
+			Entity copy = (Entity)e.clone();
+			s.entities.add(copy);
+		}
+		
+		s.linkProbability = this.linkProbability;
+		s.idf = this.idf;
+		
+		return s;
+	}
+	
 }

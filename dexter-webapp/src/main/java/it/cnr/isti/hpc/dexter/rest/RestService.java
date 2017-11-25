@@ -247,7 +247,7 @@ public class RestService {
 			@FormParam("wn") @DefaultValue("false") String wikiNames,
 			@FormParam("debug") @DefaultValue("false") String dbg,
 			@FormParam("format") @DefaultValue("text") String format,
-			@QueryParam("min-conf") @DefaultValue("0.5") String minConfidence) {
+			@QueryParam("min-conf") @DefaultValue("0.2") String minConfidence) {
 
 		DexterLocalParams requestParams = getLocalParams(form);
 		return annotate(requestParams, text, n, spotter, disambiguator,
@@ -305,17 +305,6 @@ public class RestService {
 		
 		EntityMatchList eml = tagger.tag(requestParams, doc);
 		
-		//TEST
-		System.out.println("Vediamo cosa c'è in eml. Nota bene: DISAMBIGUAZIONE FINITA");
-		for (EntityMatch em : eml)
-		{
-			Entity e = em.getEntity();
-			SpotMatch sm = em.getSpot();
-			Spot spotTemp = sm.getSpot();
-			System.out.println("mention: " + spotTemp.getMention() + "\nEntity id: " + e.getId());
-							
-		}
-		
 		AnnotatedDocument adoc = new AnnotatedDocument(doc);
 
 		if (debug) {
@@ -328,8 +317,9 @@ public class RestService {
 			adoc.setMeta(meta);
 
 		}
-		annotate(adoc, eml, entitiesToAnnotate, addWikinames, minConfidence);
-
+		//annotate(adoc, eml, entitiesToAnnotate, addWikinames, minConfidence);
+		annotate(adoc, eml, addWikinames, minConfidence);
+		
 		// logger.info("annotate: {}", annotated);
 		return ok(adoc);
 	}
@@ -341,8 +331,10 @@ public class RestService {
 	}
 
 	public void annotate(AnnotatedDocument adoc, EntityMatchList eml,
-			int nEntities, boolean addWikiNames, double minConfidence) {
+			int nEntities, boolean addWikiNames, double minConfidence) 
+	{
 		eml.sort();
+		//boolean unknown = false;
 		EntityMatchList emlSub = new EntityMatchList();
 		int size = Math.min(nEntities, eml.size());
 		List<AnnotatedSpot> spots = adoc.getSpots();
@@ -353,6 +345,8 @@ public class RestService {
 				//logger.debug("remove entity {}, confidence {} to low",
 					//	em.getId(), em.getScore());
 				System.out.println("remove entity " + em.getId() + " confidence " + em.getScore() + " too low");
+				//System.out.println("It'll be set to Unknown. \n");
+				//unknown = true;
 				continue;
 			}
 			emlSub.add(em);
@@ -362,8 +356,18 @@ public class RestService {
 							.getFrequency(), em.getId(), em.getFrequency(),
 					em.getCommonness(), em.getScore());
 			spot.setField(em.getSpot().getField().getName());
-			if (addWikiNames) {
-				spot.setWikiname(helper.getLabel(em.getId()));
+			if (addWikiNames) 
+			{
+				//if (!unknown)
+				//{
+					spot.setWikiname(helper.getLabel(em.getId()));
+				//}
+				//else
+				//{
+					//spot.setWikiname("Unknown");
+					//unknown = false;
+				//}
+				
 			}
 
 			spots.add(spot);

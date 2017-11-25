@@ -4,25 +4,36 @@ public class CoupleRelatedness implements Comparable<CoupleRelatedness>
 {
 	Gene gene1;
 	Gene gene2;
+	int id1;
+	int id2;
 	double relatedness;
 	
-	CoupleRelatedness(Gene gene1, Gene gene2, double relatedness)
+	CoupleRelatedness(Gene gene1, Gene gene2, int id1, int id2, double relatedness)
 	{
 		this.gene1 = gene1;
 		this.gene2 = gene2;
+		this.id1 = id1;
+		this.id2 = id2;
 		this.relatedness = relatedness;
 	}
-
-	Gene getGene1() {
-		return gene1;
+	
+	CoupleRelatedness(Gene gene1, Gene gene2, int id1, int id2)
+	{
+		this.gene1 = gene1;
+		this.gene2 = gene2;
+		this.id1 = id1;
+		this.id2 = id2;
 	}
 
-	Gene getGene2() {
-		return gene2;
-	}
+	Gene getGene1() { return gene1; }
 
-	double getRelatedness() {
-		return relatedness;
+	Gene getGene2() { return gene2; }
+
+	double getRelatedness() { return relatedness; }
+	
+	void setRelatedness(double relatedness)
+	{
+		this.relatedness = relatedness;
 	}
 	
 	boolean geneInCouple(Gene g)

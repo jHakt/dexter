@@ -81,7 +81,7 @@ public class DictionarySpotter extends AbstractSpotter implements Spotter {
 					// hit in cache
 					s = cache.get(text);
 					if (s != null) {
-						s = s.clone();
+						s = (Spot)s.clone();
 					}
 				} else {
 					s = spotRepo.getSpot(text);
