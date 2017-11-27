@@ -10,7 +10,7 @@ public class Gene implements Cloneable
 	/**
 	 * Posizione all'interno del cromosoma.
 	 */
-	private int pos;
+	private int pos; 
 	
 	/**
 	 * Valore del gene. Un intero che rappresenta l'entità di mappatura scelta.

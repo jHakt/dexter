@@ -7,7 +7,7 @@ import it.cnr.isti.hpc.dexter.spot.SpotMatchList;
 
 public class Population implements Iterable<Chromosome>
 {
-	/**
+	/** 
 	 * Lista che contiene tutti i membri della popolazione.
 	 */
 	private ArrayList<Chromosome> population;

@@ -6,7 +6,7 @@ public class CoupleRelatedness implements Comparable<CoupleRelatedness>
 	Gene gene2;
 	int id1;
 	int id2;
-	double relatedness;
+	double relatedness; 
 	
 	CoupleRelatedness(Gene gene1, Gene gene2, int id1, int id2, double relatedness)
 	{
