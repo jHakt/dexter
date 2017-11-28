@@ -25,6 +25,15 @@ import it.cnr.isti.hpc.dexter.spot.Spot;
 import it.cnr.isti.hpc.dexter.spot.SpotMatch;
 import it.cnr.isti.hpc.dexter.spot.SpotMatchList;
 
+/**
+ * Modella l'entit&agrave;  Cromosoma. Il cromosoma &egrave; formato da una lista di geni e possiede una fitness, 
+ * una fitness di tipo rank, una fitness annealed. Contiene inoltre, la SpotMatchList (essenziale per 
+ * recuperare gli id delle entit&agrave;  per calcolare la correlazione) e una lista che contiene la dimensione del 
+ * vettore binario di ogni gene.
+ * 
+ * @author Giovanni Izzi
+ *
+ */
 public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 {
 	/** 
@@ -33,7 +42,7 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 	private int id; 
 	
 	/**
-	 * Ogni posizione rappresenta l'entità di mapping scelta per la corrispondente menzione.
+	 * Ogni posizione rappresenta l'entit&agrave; di mapping scelta per la corrispondente menzione.
 	 */
 	private ArrayList<Gene> genes;
 	
@@ -41,13 +50,30 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 	 * Fitness del cromosoma.
 	 */
 	private double fitness;
+	
+	/**
+	 * Fitness normalizzata.
+	 */
 	private double normFitness;
 	
+	/**
+	 * Rank di questo cromosoma.
+	 */
 	private int rank;
+	
+	/**
+	 * Rank normalizzato.
+	 */
 	private double normRank;
 	
+	/**
+	 * Fitness annealed.
+	 */
 	private double annealedFitness;
 
+	/**
+	 * Contiene tutte le informazioni sugli spot ritrovati durante la fase di spotting.
+	 */
 	private SpotMatchList spotMatchList;
 	
 	/**
@@ -57,6 +83,13 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 	
 	private IdHelper helper = IdHelperFactory.getStdIdHelper();
 
+	/**
+	 * Costruttore di classe, avvalora gli attributi usando i paramentri in input.
+	 * 
+	 * @param id Identificatore del cromosoma.
+	 * @param sml SpotMatchList che contiene tutte le informazioni sugli spot.
+	 * @param dimGenes Lista che contiene la dimensione massima dei binari di ogni gene.
+	 */
 	public Chromosome(int id, SpotMatchList sml, ArrayList<Integer> dimGenes)
 	{
 		this.id = id;
@@ -65,6 +98,10 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 		this.dimBinGenes = dimGenes;
 	}
 	
+	/**
+	 * Crea questo cromosoma in maniera random, cio&egrave; sceglie un valore casuale per ogni gene. Se l'id del 
+	 * cromosoma &egrave; 0, assegna od ogni gene il valore 0 che rappresenta l'entit&agrave;  candidata pi&ugrave; probabile.
+	 */
 	public void createRandom()
 	{
 		if (this.genes.size() != 0)
@@ -95,6 +132,11 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 		
 	}
 	
+	/**
+	 * Calcola la fitness del cromosoma, questa viene calcolata sommando tutte le coppie di correlazione.
+	 * 
+	 * @return un double che &egrave; la fitness di questo cromosoma.
+	 */
 	public double calculateFitness()
 	{
 		double fit = 0.0;
@@ -109,6 +151,12 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 		return fit;
 	}
 	
+	/**
+	 * Calcola il valore di tutte le coppie di correlazione, CoupleRelatedness, e le inserisce in una lista.
+	 * 
+	 * @return un ArrayList che contiene tutte le coppie di correlazione.
+	 * @see CoupleRelatedness
+	 */
 	private ArrayList<CoupleRelatedness> allCouple()
 	{
 		ArrayList<CoupleRelatedness> listRel = new ArrayList<CoupleRelatedness>();
@@ -210,6 +258,15 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 		return listRel;
 	}
 	
+	/**
+	 * Calcola la averageFitness del gene passato in input. La fitness di un gene &egrave; uguale al numero 
+	 * di geni \ 3, ed ha come limite superiore il valore 2.
+	 * 
+	 * @param g Gene per il quale si vuole calcolare la average fitness.
+	 * @param listRel Lista di tutte le coppie di correlazione.
+	 * @param numGenes Numero di geni.
+	 * @return La somma di tutte le coppie di correlazione dove compare il gene in input.
+	 */
 	private double calculateFitnessGene(Gene g, List<CoupleRelatedness> listRel, int numGenes)
 	{
 		//CAMBIAMENTO

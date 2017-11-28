@@ -14,16 +14,48 @@ import it.cnr.isti.hpc.dexter.util.DexterLocalParams;
 import it.cnr.isti.hpc.dexter.util.DexterParams;
 
 /**
- * A disambiguator that utilize a genetic algorithm.
+ * Un disambiguatore che implementa l'algoritmo GANEL, un algortimo genetico per il task di entity linking.
+ * 
+ * <br><br>GANEL: <br><br>
+ * <strong>begin</strong><br>
+ * &emsp;	Set t = 0, probCross = 0.8, probMut = 0.6, maxGen = 35, gen = 0 <br>
+ * &emsp;	Set ra = 1, rb = 0 <br>
+ * &emsp;	P(t) <- Construct initial population <br>
+ * &emsp;	Calculate Annealed Fitness <br>
+ * &emsp;	<strong>while</strong> ( gen < maxGen ) <strong>do</strong> <br>
+ * &emsp;&emsp;				P(t+1) <- Create a new empty population <br>
+ * &emsp;&emsp;				Put first two best chromosomes from P(t) in P(t+1) <br>
+ * &emsp;&emsp;				Select 'size (P(t)) - 2 chromosomes from P(t)' <br>
+ * &emsp;&emsp;				Add these chromosomes to the mating pool <br>
+ * &emsp;&emsp;				<strong>while</strong> ( mating pool is not empty ) <strong>do</strong> <br>
+ * &emsp;&emsp;&emsp;							Choose two chromosomes from mating pool <br>
+ * &emsp;&emsp;&emsp;							Apply crossover operator <br>
+ * &emsp;&emsp;&emsp;							Apply mutation operator <br>
+ * &emsp;&emsp;							Put offsprings in P(t+1) <br>
+ * &emsp;&emsp;				ra <- ra - 1 / maxGen <br>
+ * &emsp;&emsp;				rb <- rb + 1 / maxGen <br>
+ * &emsp;&emsp;				probMut <- probMut - 0.5 / maxGen <br>
+ * &emsp;&emsp;				P(t) <- P(t+1) <br>
+ * &emsp;&emsp;				t <- t + 1 <br>
+ * &emsp;	Take the best chromosome from the final population <br>
+ * &emsp;	Validate this chromosome as solution end <br>
+ * <strong>end</strong>
  *  
  * @author Giovanni Izzi 
  *
  */
 public class GeneticDisambiguator implements Disambiguator 
 {
+	/**
+	 * Il mating pool.
+	 */
 	private ArrayList<Chromosome> matingPool = new ArrayList<Chromosome>();
 	
-	
+	/**
+	 * All'inzio ordina la SpotMatchList sml e poi usa l'algoritmo GANEL per generare la soluzione.
+	 * 
+	 * @return EntityMatchList che rappresenta la soluzione generata da GANEL.
+	 */
 	@Override
 	public EntityMatchList disambiguate(DexterLocalParams requestParams, SpotMatchList sml) 
 	{
@@ -138,6 +170,14 @@ public class GeneticDisambiguator implements Disambiguator
 		
 	}
 	
+	/**
+	 * Metodo privato che costruisce la popolazione iniziale. La dimensione della popolazione &egrave; adattiva, 
+	 * &egrave; impostata al doppio della dimensione dell'insieme di entit&agrave; candidate pi&ugrave; grande, 
+	 * possiede come limite superiore il valore 100.
+	 * 
+	 * @param sml SpotMatchList che contiene tutte le informazioni sugli spot trovati precedentemente.
+	 * @return La popolazione iniziale appena costruita.
+	 */
 	private Population constructPopulation(SpotMatchList sml)
 	{
 		ArrayList<Integer> dimBinGenes = new ArrayList<Integer>();
@@ -178,11 +218,25 @@ public class GeneticDisambiguator implements Disambiguator
 		return population;
 	}
 	
+	/**
+	 * Calcola l'annealed fitness della popolazione (della precedente generazione) data in input.
+	 * 
+	 * @param prevGen Popolazione sulla quale calcolare l'annealed fitness.
+	 * @param ra Parametro ra dell'annealed fitness.
+	 * @param rb Parametro rb dell'annealed fitness.
+	 */
 	private void calculateAnnealedFitness(Population prevGen, double ra, double rb)
 	{
 		prevGen.calculateAnnealedFitness(ra, rb);
 	}
 	
+	/**
+	 * Operatore di selezione. Seleziona 'dimMaxPop' cromosomi dalla popolazione e li aggiunge al mating pool. 
+	 * Ogni elemento pu&ograve; essere selezionato pi&ugrave; volte.
+	 * 
+	 * @param prevGen Popolazione alla quale si vuole applicare l'operatore di selezione.
+	 * @param dimMaxPop Numero di elementi da selezionare.
+	 */
 	private void selection(Population prevGen, int dimMaxPop)
 	{
 		double sumAnnealed = 0.0;
@@ -210,6 +264,16 @@ public class GeneticDisambiguator implements Disambiguator
 		
 	}
 	
+	/**
+	 * Operatore di crossover. Seleziona due elementi dal mating pool e effettua il crossover richiamando il 
+	 * metodo crossover della classe Population. Se il crossover non viene effettuato ritorna una copia dei 
+	 * due cromosomi scelti.
+	 * 
+	 * @param probCross Tasso di crossover.
+	 * @param matingPoolSize Dimensione del matin pool.
+	 * @return un ArrayList che rappresenta la prole generata dal crossover.
+	 * @see Population
+	 */
 	private ArrayList<Chromosome> crossover(double probCross, int matingPoolSize)
 	{
 		Random random = new Random();
@@ -247,11 +311,27 @@ public class GeneticDisambiguator implements Disambiguator
 		
 	}
 
+	/**
+	 * Operatore di mutazione. Chiama il metodo mutation della classe Population.
+	 * 
+	 * @param offspring Prole generata dall'operatore di crossover.
+	 * @param probMutation Tasso di mutazione.
+	 * @see Population
+	 */
 	private void mutation(ArrayList<Chromosome> offspring, double probMutation)
 	{
 		Population.mutation(offspring, probMutation);
 	}
 	
+	/**
+	 * Avvalora il miglior cromosoma presente nell'ultima generazione come soluzione, recuperando per ogni gene 
+	 * l'entit&agrave; candidata in base al valore contenuto dal gene e impostando lo score di quest'ultima pari 
+	 * alla average fitness del gene.
+	 * 
+	 * @param best Miglior cromosoma presente nell'ultima generazione.
+	 * @param sml SpotMatchList che contiene tutte le informazioni sugli spot.
+	 * @return un EntityMatchList che rappresenta la soluzione generata.
+	 */
 	private EntityMatchList validate(Chromosome best, SpotMatchList sml)
 	{
 		

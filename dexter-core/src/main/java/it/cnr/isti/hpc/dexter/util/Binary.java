@@ -3,8 +3,21 @@ package it.cnr.isti.hpc.dexter.util;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe che gestisce la conversione da decimale a binario e viceversa.
+ * 
+ * @author Giovanni Izzi
+ *
+ */
 public class Binary 
 {
+	/**
+	 * Trasforma il numero decimale in input in binario. Questo numero binario viene restituito 
+	 * sotto forma di arraylist di Integer.
+	 * 
+	 * @param value Numero decimale da convertire in binario.
+	 * @return un ArrayList di Integer che contiene la rappresentazione binaria del numero decimale in input.
+	 */
 	public static ArrayList<Integer> intToBinary(int value)
 	{
 		ArrayList<Integer> binary = new ArrayList<Integer>();
@@ -27,6 +40,12 @@ public class Binary
 		
 	}
 	
+	/**
+	 * Converte un binario in numero decimale.
+	 * 
+	 * @param binary Numero binario da convertire in decimale.
+	 * @return un int che rappresenta il valore decimale del binario in input.
+	 */
 	public static int listBinToInt(List<Integer> binary)
 	{
 		int binValue = 0;
@@ -41,6 +60,12 @@ public class Binary
 		return binValue;
 	}
 	
+	/**
+	 * Converte un numero binario, memorizzato come String, in decimale.
+	 * 
+	 * @param binary Numero binario da convertire in decimale.
+	 * @return un int che rappresenta il valore decimale del binario in input.
+	 */
 	public static int stringBinToInt(String binary)
 	{
 		int binValue = 0;
@@ -65,6 +90,12 @@ public class Binary
 		return binValue;
 	}
 	
+	/**
+	 * Restituisce il numero di bit necessari per convertire il numero decimale in input.
+	 * 
+	 * @param decimal Numero decimale per il quale si vuole sapere il numero di bit necessari per la conversione in binario.
+	 * @return un int che rappresenta il numero di bit necessari per rappresentare il numero decimale in input in binario.
+	 */
 	public static int bitForInt(int decimal)
 	{
 		String binS = Integer.toBinaryString(decimal);

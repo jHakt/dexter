@@ -5,6 +5,13 @@ import java.util.Iterator;
 import java.util.Random;
 import it.cnr.isti.hpc.dexter.spot.SpotMatchList;
 
+/**
+ * Modella l'entit&agrave; Popolazione dell'algoritmo genetico. Una popolazione &egrave; costituita da un certo 
+ * numero di individui (cromosomi) che rappresentano le soluzioni candidate per il problema in esame.
+ * 
+ * @author Giovanni Izzi
+ *
+ */
 public class Population implements Iterable<Chromosome>
 {
 	/** 
@@ -22,12 +29,23 @@ public class Population implements Iterable<Chromosome>
 	 */
 	private int popDim;
 	
+	/**
+	 * Miglior cromosoma di questa popolazione.
+	 */
 	private Chromosome bestChromosome;
+	
+	/**
+	 * Secondo miglior cromosoma di questa popolazione.
+	 */
 	private Chromosome secondBestChromosome;
+	
+	/**
+	 * Miglior fintess associata al miglior cromosoma di questa popolazione.
+	 */
 	private double bestFitness;
 	
 	/**
-	 * Costruttore di default.
+	 * Costruttore di default. Imposta la dimensione massima della popolaziona a 50 individui.
 	 */
 	public Population()
 	{
@@ -48,6 +66,11 @@ public class Population implements Iterable<Chromosome>
 		popDim = 0;
 	}
 	
+	/**
+	 * Aggiunge il cromosoma in input in questa popolazione.
+	 * 
+	 * @param c Cromosoma che si vuole aggiungere in questa popolazione.
+	 */
 	public void addToPopulation(Chromosome c)
 	{
 		if (popDim < maxPopDim)
@@ -58,6 +81,11 @@ public class Population implements Iterable<Chromosome>
 		
 	}
 	
+	/**
+	 * Rimuove il cromosoma in input da questa popolazione.
+	 * 
+	 * @param c Cromosoma che si vuole rimuovere dalla popolazione.
+	 */
 	public void removeFromPopulation(Chromosome c)
 	{
 		if (!population.isEmpty())
@@ -111,7 +139,10 @@ public class Population implements Iterable<Chromosome>
 		
 	
 	//SERIE DI METODI PER CALCOLARE LE FITNESS
-	
+	/**
+	 * Metodo privato di supporto al metodo calculateAnnealedFitness. 
+	 * Calcola il rank di ogni cromosoma presente in questa popolazione.
+	 */
 	private void calculateRank()
 	{
 		this.population.sort(null);
@@ -126,6 +157,10 @@ public class Population implements Iterable<Chromosome>
 		
 	}
 	
+	/**
+	 * Metodo privato di supporto al metodo calculateAnnealedFitness. Normalizza il rank di ogni 
+	 * cromosoma calcolato dal metodo calculateRank.
+	 */
 	private void calcNormRank()
 	{
 		double sumRank = 0;
@@ -158,6 +193,10 @@ public class Population implements Iterable<Chromosome>
 		
 	} */
 	
+	/**
+	 * Metodo privato di supporto al metodo calculateAnnealedFitness. Normalizza la fitness 
+	 * di ogni cromosoma presente in questa popolazione.
+	 */
 	private void calcNormFitness()
 	{
 		double sumFitness = 0.0;
@@ -178,6 +217,17 @@ public class Population implements Iterable<Chromosome>
 		
 	}
 	
+	/**
+	 * Calcola la annealedFitness di ogni cromosoma presente in questa popolazione. La fitness annealed si calcola 
+	 * con la seguente formula:<br><br> 
+	 * FW = FitnessRank * ra + Fitness * rb<br><br> 
+	 * Dove:<br> 
+	 * ra = ha come valore iniziale "1" e viene diminuto ad ogni generazione di 1/maxGen<br> 
+	 * rb = ha come valore iniziale "0" e viene incrementato ad ogni generazione di 1/maxGen
+	 * 
+	 * @param ra Parametro della fitness annealed.
+	 * @param rb Parametro della fitness annealed.
+	 */
 	public void calculateAnnealedFitness(double ra, double rb)
 	{
 		//this.calculateFitness();
@@ -193,7 +243,15 @@ public class Population implements Iterable<Chromosome>
 	}
 	
 	// FINE METODI PER CALCOLARE FITNESS
-	
+	/**
+	 * Applica l'operatore di crossover ai due cromosomi in input. Scorre i due cromosomi e 
+	 * applica l'operatore di crossover ai geni corrispondenti. Per ulteriori informazioni vedere la classe Gene.
+	 * 
+	 * @param parent1 Primo cromosoma genitore.
+	 * @param parent2 Secondo cromosoma genitore.
+	 * @return un ArrayList che contiene la prole generata da questo operatore.
+	 * @see Gene
+	 */
 	public static ArrayList<Chromosome> crossover(Chromosome parent1, Chromosome parent2)
 	{
 		ArrayList<Chromosome> newOffspring = new ArrayList<Chromosome>();
@@ -238,6 +296,14 @@ public class Population implements Iterable<Chromosome>
 		return newOffspring;
 	}
 	
+	/**
+	 * Operatore di mutazione. Viene applicato in accordo ad un numero random generato. Vengono modificati 
+	 * solo i geni la cui average fitness &egrave; minore di 0,5. Per ulteriori dettagli vedere la classe Gene.
+	 * 
+	 * @param offspring Prole generata dall'operatore di crossover.
+	 * @param probMutation Tasso di mutazione.
+	 * @see Gene
+	 */
 	public static void mutation(ArrayList<Chromosome> offspring, double probMutation)
 	{
 		Random random = new Random();
@@ -295,6 +361,9 @@ public class Population implements Iterable<Chromosome>
 		
 	}
 	
+	/**
+	 * Ritrova nella popolazione i due migliori cromosomi.
+	 */
 	public void best()
 	{
 		int popSize = population.size();

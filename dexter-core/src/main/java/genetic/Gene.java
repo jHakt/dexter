@@ -5,6 +5,13 @@ import java.util.Random;
 
 import it.cnr.isti.hpc.dexter.util.Binary;
 
+/**
+ * Modella l'entit&agrave;  Gene. In GANEL un gene contiene, in binario, l'indice dell'entit&agrave; candidata all'interno 
+ * dell'insieme di entit&agrave; candidate.
+ * 
+ * @author Giovanni Izzi
+ *
+ */
 public class Gene implements Cloneable
 {
 	/**
@@ -17,6 +24,9 @@ public class Gene implements Cloneable
 	 */
 	private int value;
 	
+	/**
+	 * Massimo valore che il gene pu&ograve; assumere.
+	 */
 	private int maxValue;
 	
 	/**
@@ -24,6 +34,9 @@ public class Gene implements Cloneable
 	 */
 	private ArrayList<Integer> binary;
 	
+	/**
+	 * Massima dimensione dell'array binary.
+	 */
 	private int maxDimBin;
 	
 	/**
@@ -31,6 +44,15 @@ public class Gene implements Cloneable
 	 */
 	private double averageFitness;
 	
+	/**
+	 * Costruttore di classe, avvalora gli attributi.
+	 * 
+	 * @param pos Posizione del gene all'interno del cromosoma.
+	 * @param value Valore di questo gene, cio&egrave; l'indice dell'entit&agrave; candidata all'interno 
+	 * dell'insieme di entit&agrave; candidate.
+	 * @param maxValue Massimo valore che questo gene pu&ograve; assumere.
+	 * @param dimMaxBin Massima dimensione del binario.
+	 */
 	public Gene(int pos, int value, int maxValue, int dimMaxBin)
 	{
 		this.pos = pos;
@@ -45,9 +67,17 @@ public class Gene implements Cloneable
 		
 	}
 	
+	/**
+	 * Costruttore di classe, avvalora solo la posizione del gene.
+	 * 
+	 * @param pos Posizione del gene all'interno del cromosoma.
+	 */
 	public Gene(int pos) { this.pos = pos; }
 	
 	//Private for copy
+	/**
+	 * Costruttore privato.
+	 */
 	private Gene() { }
 
 	//Getters and setters
@@ -76,6 +106,14 @@ public class Gene implements Cloneable
 	}
 	
 	//CROSSOver tra geni
+	/**
+	 * Crossover tra geni. Scambia i bit dei binari in accordo ad un valore random. Se il valore 
+	 * random &egrave; uguale a 0 inserisce nel gene corrispondente del primo figlio il bit del gene1 
+	 * e nel secondo figlio il bit del gene2, altrimenti il contrario.
+	 * 
+	 * @param gene1 Primo gene genitore.
+	 * @param gene2 Secondo gene genitore.
+	 */
 	static void crossoverGenes(Gene gene1, Gene gene2)
 	{
 		ArrayList<Integer> binG1 = gene1.binary;
@@ -200,6 +238,9 @@ public class Gene implements Cloneable
 	}
 	
 	//Mutazione di un gene, tolto lo static
+	/**
+	 * Muta questo gene, la mutazione avviene creando un nuovo binary in maniera casuale.
+	 */
 	void mutationGene()
 	{
 		//Mutazione randomica per ogni bit
@@ -220,6 +261,9 @@ public class Gene implements Cloneable
 		this.setValue(newValue);
 	}
 	
+	/**
+	 * Completa l'array binary inserendo degli zero a sinistra quando la sua dimensione &egrave; minore della massima.
+	 */
 	private void autoCompleteBinary()
 	{
 		int size = binary.size();
