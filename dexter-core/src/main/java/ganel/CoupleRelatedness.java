@@ -1,4 +1,4 @@
-package genetic;
+package ganel;
 
 /**
  * Modella l'entit&agrave; coppia di correlazione (e1, e2), dove "e" &egrave; un'entit&agrave; candidata.

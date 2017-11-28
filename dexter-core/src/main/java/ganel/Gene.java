@@ -1,4 +1,4 @@
-package genetic;
+package ganel;
 
 import java.util.ArrayList;
 import java.util.Random;

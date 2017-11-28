@@ -2,9 +2,10 @@ package it.cnr.isti.hpc.dexter.disambiguation;
 
 import java.util.ArrayList;
 import java.util.Random;
-import genetic.Chromosome;
-import genetic.Gene;
-import genetic.Population;
+
+import ganel.Chromosome;
+import ganel.Gene;
+import ganel.Population;
 import it.cnr.isti.hpc.dexter.entity.EntityMatch;
 import it.cnr.isti.hpc.dexter.entity.EntityMatchList;
 import it.cnr.isti.hpc.dexter.spot.SpotMatch;
