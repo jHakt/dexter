@@ -6,7 +6,8 @@
 		<model>
 			<name>en</name>
 			<!-- <path>/data/diego/model20130403</path> -->
-			<path>/en-model-20140707</path>
+            <path>/en-model-20180901</path>
+            
 		</model>
 		<model>
 			<name>it</name>
@@ -178,6 +179,12 @@
 		<spotter>
 			<name>nif</name>
 			<class>it.cnr.isti.hpc.dexter.spotter.NifSpotter</class>
+			<filters>
+				<filter>
+					<name>probability-filter</name>
+				</filter>
+				
+			</filters>
 		</spotter>
 	</spotters>
 	<taggers>
