@@ -6,6 +6,7 @@ mkdir -p $SPOT_FOLDER/ram
 $JAVA it.cnr.isti.hpc.dexter.cli.spot.ram.GenerateSpotsMinimalPerfectHashCLI  -output $SPOT_HASHES
 echo "uncompressing spot file $SPOT_FILE "
 zcat ${SPOT_FILE/.gz/} > $TTMP
+#gzcat $SPOT_FILE > $TTMP
 
 echo "uncompressing hash file $SPOT_HASHES"
 gunzip $SPOT_HASHES

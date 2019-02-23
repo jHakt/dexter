@@ -2,7 +2,7 @@
 
 source scripts/config.sh
 
-
+mkdir -p $GRAPH_DIR
 echo "generates incoming and outcoming edges for each node (in $OUT_EDGES and $IN_EDGES) requires $SPOT"
 echo "filtering edges"
 cat $SPOT | awk -F'	' '{if ($2 > 0 && $3 > 0) print $2"	"$3}'  | sort -nk2,2 -nk1,1 | uniq > $TMP
