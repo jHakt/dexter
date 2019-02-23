@@ -90,12 +90,12 @@ public class RamSpotRepository implements SpotRepository {
 		Stopwatch s = new Stopwatch();
 		s.start("spot");
 		//Spot spot = rs.getSpot("glass");
-		//Spot spot = rs.getSpot("gunners");
+		Spot spot = rs.getSpot("dybala");
 		s.stop("spot");
-		//System.out.println(spot);
+		System.out.println(spot);
 		
-		IdHelper helper = IdHelperFactory.getStdIdHelper();
-		System.out.println(helper.getLabel(4224));
+		//IdHelper helper = IdHelperFactory.getStdIdHelper();
+		//System.out.println(helper.getLabel(4224));
 		// System.out.println("retrieved: "+s.stat("spot"));
 
 	}

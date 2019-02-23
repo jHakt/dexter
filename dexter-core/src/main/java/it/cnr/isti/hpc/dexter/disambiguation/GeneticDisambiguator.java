@@ -83,9 +83,9 @@ public class GeneticDisambiguator implements Disambiguator
 		
 			//Parametri dell'algoritmo
 			double probCross = 0.8;
-			double probMut = 0.6;
+			double probMut = 0.01;
 			int gen = 0;
-			int maxGen = 35;
+			int maxGen = 100;
 			double ra = 1;
 			double rb = 0;
 			//double threshold = 0.6;
@@ -134,7 +134,7 @@ public class GeneticDisambiguator implements Disambiguator
 				//Calcola la fitness
 				ra -= (1 / maxGen);
 				rb += (1 / maxGen);
-				probMut -= (0.5 / maxGen);
+				//probMut -= (0.5 / maxGen);
 				calculateAnnealedFitness(gen_i, ra, rb);
 				gen_i.best();
 		
@@ -271,7 +271,7 @@ public class GeneticDisambiguator implements Disambiguator
 	 * due cromosomi scelti.
 	 * 
 	 * @param probCross Tasso di crossover.
-	 * @param matingPoolSize Dimensione del matin pool.
+	 * @param matingPoolSize Dimensione del mating pool.
 	 * @return un ArrayList che rappresenta la prole generata dal crossover.
 	 * @see Population
 	 */
@@ -288,9 +288,9 @@ public class GeneticDisambiguator implements Disambiguator
 			rand2 = random.nextInt(matingPoolSize);
 		}
 
+		//Perché la remove shifta gli elementi a sinistra diminuendo di 1 l'indice
 		if (rand1 < rand2)
 			rand2--;
-			
 			
 		Chromosome parent1 = matingPool.remove(rand1);
 		Chromosome parent2 = matingPool.remove(rand2);

@@ -52,7 +52,7 @@ public class SpotReader implements Iterator<Spot> {
 	public SpotReader(String spotSrcTargetFile, String spotDocFreqFile) {
 		RecordReader<SpotSrcTarget> reader = new RecordReader<SpotSrcTarget>(
 				spotSrcTargetFile, new SpotSrcTargetParser());
-		;
+
 		spotSrcTargetIterator = reader.iterator();
 		currentSST = spotSrcTargetIterator.next();
 		RecordReader<SpotFrequency> reader2 = new RecordReader<SpotFrequency>(

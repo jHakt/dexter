@@ -162,7 +162,7 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 		ArrayList<CoupleRelatedness> listRel = new ArrayList<CoupleRelatedness>();
 		
 		int numGenes = genes.size();
-		String json = "[";
+		//String json = "[";
 		for( int i = 0; i < numGenes-1; i++ )
 		{
 			Gene genI = genes.get(i);
@@ -184,16 +184,16 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 				Entity entityJ = chooseGJ.getEntity();
 				
 				//Istanziamo la classe che calcola la correlazione
-				//MilneRelatedness2 relIJ = new MilneRelatedness2();
+				MilneRelatedness relIJ = new MilneRelatedness();
 				int id1 = entityI.getId();
 				int id2 = entityJ.getId();
-				//relIJ.set(id1, id2);
-				//double relatedness = relIJ.getScore();
+				relIJ.set(id1, id2);
+				double relatedness = relIJ.getScore();
 				
 				//2
-				//MilneRelatedness2 relJI = new MilneRelatedness2();
-				//relJI.set(id2, id1);
-				//double relatedness2 = relJI.getScore();
+				MilneRelatedness relJI = new MilneRelatedness();
+				relJI.set(id2, id1);
+				double relatedness2 = relJI.getScore();
 				
 				
 				//Similarity
@@ -207,17 +207,17 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 				//new double
 				//double relSim = (relatedness + distance1 + distance2) / 3;
 				
-				//CoupleRelatedness cr = new CoupleRelatedness(genI, genJ, id1, id2, relatedness);
-				CoupleRelatedness cr = new CoupleRelatedness(genI, genJ, id1, id2);
+				CoupleRelatedness cr = new CoupleRelatedness(genI, genJ, id1, id2, relatedness);
+				//CoupleRelatedness cr = new CoupleRelatedness(genI, genJ, id1, id2);
 				listRel.add(cr);
 				
-				//CoupleRelatedness cr2 = new CoupleRelatedness(genJ, genI, id2, id1, relatedness2);
-				CoupleRelatedness cr2 = new CoupleRelatedness(genJ, genI, id2, id1);
+				CoupleRelatedness cr2 = new CoupleRelatedness(genJ, genI, id2, id1, relatedness2);
+				//CoupleRelatedness cr2 = new CoupleRelatedness(genJ, genI, id2, id1);
 				listRel.add(cr2);
 			}
 		}
 		
-		
+		/*
 		String json1 = json.substring(0, json.length()-1);
 		json1 = json1 + "]";
 		
@@ -254,6 +254,7 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 			Logger.getLogger(Chromosome.class.getName()).log(Level.SEVERE, null, ex);
 	    }
 		
+		*/
 		
 		return listRel;
 	}

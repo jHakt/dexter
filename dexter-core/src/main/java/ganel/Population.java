@@ -290,6 +290,9 @@ public class Population implements Iterable<Chromosome>
 			
 		}
 		
+		off1.setFitness(off1.calculateFitness());
+		off2.setFitness(off2.calculateFitness());
+		
 		newOffspring.add(off1);
 		newOffspring.add(off2);
 		
