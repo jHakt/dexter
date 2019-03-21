@@ -364,8 +364,8 @@ public class RestService {
 				//}
 				//else
 				//{
-					//spot.setWikiname("Unknown");
-					//unknown = false;
+					//spot.setWikiname("http://aksw.org/notInWiki/" + em.getMention());
+				//	unknown = false;
 				//}
 				
 			}

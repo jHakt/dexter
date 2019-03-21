@@ -3,16 +3,17 @@ package it.cnr.isti.hpc.dexter.disambiguation;
 import java.util.ArrayList;
 import java.util.Random;
 
-import ganel.Chromosome;
-import ganel.Gene;
-import ganel.Population;
 import it.cnr.isti.hpc.dexter.entity.EntityMatch;
 import it.cnr.isti.hpc.dexter.entity.EntityMatchList;
 import it.cnr.isti.hpc.dexter.spot.SpotMatch;
 import it.cnr.isti.hpc.dexter.spot.SpotMatchList;
-import it.cnr.isti.hpc.dexter.util.Binary;
 import it.cnr.isti.hpc.dexter.util.DexterLocalParams;
 import it.cnr.isti.hpc.dexter.util.DexterParams;
+import jHakt.GANEL.Chromosome;
+import jHakt.GANEL.Gene;
+import jHakt.GANEL.ListGenesRelatedness;
+import jHakt.GANEL.Population;
+import jHakt.Utils.Binary;
 
 /**
  * Un disambiguatore che implementa l'algoritmo GANEL, un algortimo genetico per il task di entity linking.
@@ -42,10 +43,10 @@ import it.cnr.isti.hpc.dexter.util.DexterParams;
  * &emsp;	Validate this chromosome as solution end <br>
  * <strong>end</strong>
  *  
- * @author Giovanni Izzi 
+ * @author Giovanni Luca Izzi 
  *
  */
-public class GeneticDisambiguator implements Disambiguator 
+public class GANELDisambiguator implements Disambiguator 
 {
 	/**
 	 * Il mating pool.
@@ -62,6 +63,7 @@ public class GeneticDisambiguator implements Disambiguator
 	{
 		
 		int smlSize = sml.size();
+		ListGenesRelatedness listGenesBestRel = new ListGenesRelatedness(smlSize);
 		
 		//EntityMatchList eml = new EntityMatchList();
 		/*
@@ -78,7 +80,7 @@ public class GeneticDisambiguator implements Disambiguator
 		if ( !(smlSize == 1) )
 		{
 			// Bisogna costruire la popolazione iniziale
-			Population gen_0 = constructPopulation(sml);
+			Population gen_0 = constructPopulation(sml, listGenesBestRel);
 			Population prev = gen_0;
 		
 			//Parametri dell'algoritmo
@@ -119,12 +121,15 @@ public class GeneticDisambiguator implements Disambiguator
 			
 				//System.out.println("Popolazione Generazione " + (gen + 1) + "Parziale: ");
 				//System.out.println(gen_i);
+				System.out.println("Gen: " + gen);
 			
 				selection(prev, dimMaxPop-2); // -2 perché ho aggiunto i due migliori della popolazione precedente
 				while (matingPool.size() > 0)
 				{
-					ArrayList<Chromosome> offspring = crossover(probCross, matingPool.size());
-					mutation(offspring, probMut);
+					ArrayList<Chromosome> offspring = crossover(probCross, matingPool.size(), listGenesBestRel);
+					
+					//if(gen > 9)
+					mutation(offspring, probMut, listGenesBestRel);
 				
 					//Aggiungiamo alla popolazione i due individui
 					gen_i.addToPopulation(offspring.get(0));
@@ -134,7 +139,7 @@ public class GeneticDisambiguator implements Disambiguator
 				//Calcola la fitness
 				ra -= (1 / maxGen);
 				rb += (1 / maxGen);
-				//probMut -= (0.5 / maxGen);
+				//probMut -= (0.6 / maxGen);
 				calculateAnnealedFitness(gen_i, ra, rb);
 				gen_i.best();
 		
@@ -147,6 +152,13 @@ public class GeneticDisambiguator implements Disambiguator
 			}
 		
 			Chromosome bestC = prev.getBestChromosome();
+			
+			//Verify that bestC contains the best genes found
+			//bestC = something(bestC, listGenesBestRel);
+			
+			//Just for test
+			System.out.println(listGenesBestRel);
+			
 			//Avvolorare eml con le informazioni contenute nel miglior cromosoma finale
 			eml = validate(bestC, sml);
 		}
@@ -179,10 +191,11 @@ public class GeneticDisambiguator implements Disambiguator
 	 * @param sml SpotMatchList che contiene tutte le informazioni sugli spot trovati precedentemente.
 	 * @return La popolazione iniziale appena costruita.
 	 */
-	private Population constructPopulation(SpotMatchList sml)
+	private Population constructPopulation(SpotMatchList sml, ListGenesRelatedness listGenesBestRel)
 	{
 		ArrayList<Integer> dimBinGenes = new ArrayList<Integer>();
 		int max = 0;
+	
 		
 		//Calcoliamo le dimensioni binarie di ogni gene
 		for (SpotMatch sm : sml)
@@ -203,8 +216,10 @@ public class GeneticDisambiguator implements Disambiguator
 		
 		//GRANDEZZA POPOLAZIONE ADATTIVA, se > 100 viene settata a 100 (caso Raro)
 		int sizePop = max * 2;
-		if (sizePop > 100)
-			sizePop = 100;
+		//if (sizePop > 100)
+			//sizePop = 100;
+		if (sizePop > 2000)
+			sizePop = 2000;
 		
 		Population population = new Population(sizePop);
 		//int sizeMax = population.getMaxPopDim();
@@ -212,7 +227,8 @@ public class GeneticDisambiguator implements Disambiguator
 		for(int i = 0; i < sizePop; i++)
 		{
 			Chromosome c = new Chromosome(i, sml, dimBinGenes);
-			c.createRandom();
+			//c.createRandom(listGenesBestRel);
+			c.createRandom(listGenesBestRel);
 			population.addToPopulation(c);
 		}
 		
@@ -275,7 +291,7 @@ public class GeneticDisambiguator implements Disambiguator
 	 * @return un ArrayList che rappresenta la prole generata dal crossover.
 	 * @see Population
 	 */
-	private ArrayList<Chromosome> crossover(double probCross, int matingPoolSize)
+	private ArrayList<Chromosome> crossover(double probCross, int matingPoolSize, ListGenesRelatedness listGenesBestRel)
 	{
 		Random random = new Random();
 		ArrayList<Chromosome> offspring;
@@ -299,7 +315,7 @@ public class GeneticDisambiguator implements Disambiguator
 		if (cross <= probCross)
 		{
 			//CrossOver
-			offspring = Population.crossover(parent1, parent2);
+			offspring = Population.crossover(parent1, parent2, listGenesBestRel);
 		}
 		else
 		{		
@@ -319,9 +335,9 @@ public class GeneticDisambiguator implements Disambiguator
 	 * @param probMutation Tasso di mutazione.
 	 * @see Population
 	 */
-	private void mutation(ArrayList<Chromosome> offspring, double probMutation)
+	private void mutation(ArrayList<Chromosome> offspring, double probMutation, ListGenesRelatedness listGenesBestRel)
 	{
-		Population.mutation(offspring, probMutation);
+		Population.mutation(offspring, probMutation, listGenesBestRel);
 	}
 	
 	/**

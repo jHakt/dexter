@@ -17,6 +17,7 @@ package it.cnr.isti.hpc.dexter.label;
 
 import it.cnr.isti.hpc.wikipedia.article.Article;
 import it.cnr.isti.hpc.wikipedia.article.Link;
+import jHakt.Utils.ProcessingText;
 
 import java.util.*;
 
@@ -52,7 +53,8 @@ public class IdHelper implements IdToLabel, LabelToId {
 
 
 	public String getLabel(Integer key) {
-		return idToLabel.getLabel(key);
+		//Because some entity contains unicode char leading to an error
+		return ProcessingText.convertNonAscii(idToLabel.getLabel(key));
 	}
 
 	@Override
@@ -94,5 +96,10 @@ public class IdHelper implements IdToLabel, LabelToId {
 
 	public boolean hasLabel(String label) {
 		return labelToId.getId(label) != NOID;
+	}
+
+	@Override
+	public Set<Integer> getIds(String label) {
+		return labelToId.getIds(label);
 	}
 }

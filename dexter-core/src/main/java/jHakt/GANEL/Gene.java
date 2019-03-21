@@ -1,9 +1,9 @@
-package ganel;
+package jHakt.GANEL;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import it.cnr.isti.hpc.dexter.util.Binary;
+import jHakt.Utils.Binary;
 
 /**
  * Modella l'entit&agrave;  Gene. In GANEL un gene contiene, in binario, l'indice dell'entit&agrave; candidata all'interno 
@@ -105,7 +105,7 @@ public class Gene implements Cloneable
 		
 	}
 	
-	//CROSSOver tra geni
+	//CrossOver tra geni
 	/**
 	 * Crossover tra geni. Scambia i bit dei binari in accordo ad un valore random. Se il valore 
 	 * random &egrave; uguale a 0 inserisce nel gene corrispondente del primo figlio il bit del gene1 
@@ -208,6 +208,7 @@ public class Gene implements Cloneable
 				binDec = gene1.maxValue;
 			else if (rand == 0)
 				binDec = gene1.maxValue;
+				//binDec = 0;
 			else
 				binDec = random.nextInt(gene1.maxValue);
 			
@@ -227,6 +228,7 @@ public class Gene implements Cloneable
 				binDec = gene1.maxValue;
 			else if (rand == 0)
 				binDec = gene2.maxValue;
+				//binDec = 0;
 			else
 				binDec = random.nextInt(gene2.maxValue);
 			
@@ -280,8 +282,8 @@ public class Gene implements Cloneable
 	public boolean equals(Object o)
 	{
 		Gene g = (Gene) o;
-		if (this == g)
-			return true;
+		//if (this == g)
+			//return true;
 		if(this.pos == g.pos && this.value == g.value)
 			return true;
 		

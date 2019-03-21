@@ -37,6 +37,14 @@ public interface LabelToId {
 	 * @return Returns a Set view of the keys (labels) contained in this map.
 	 */
 	public Set<String> getLabels();
+	
+	/**
+	 * Returns all ids for entities in wikipedia that contain label in their name.
+	 * 
+	 * @param label Pattern to search in wikipedia entities name.
+	 * @return
+	 */
+	public Set<Integer> getIds(String label);
 }
 	
 	

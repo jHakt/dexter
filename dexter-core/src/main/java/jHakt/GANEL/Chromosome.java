@@ -1,27 +1,27 @@
-package ganel;
+package jHakt.GANEL;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+//import java.io.BufferedReader;
+//import java.io.DataOutputStream;
+//import java.io.InputStreamReader;
+//import java.net.HttpURLConnection;
+//import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
+//import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import info.debatty.java.stringsimilarity.JaroWinkler;
-import info.debatty.java.stringsimilarity.NormalizedLevenshtein;
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
+//import info.debatty.java.stringsimilarity.JaroWinkler;
+//import info.debatty.java.stringsimilarity.NormalizedLevenshtein;
 import it.cnr.isti.hpc.dexter.entity.Entity;
 import it.cnr.isti.hpc.dexter.entity.EntityMatch;
 import it.cnr.isti.hpc.dexter.entity.EntityMatchList;
-import it.cnr.isti.hpc.dexter.label.IdHelper;
-import it.cnr.isti.hpc.dexter.label.IdHelperFactory;
+//import it.cnr.isti.hpc.dexter.label.IdHelper;
+//import it.cnr.isti.hpc.dexter.label.IdHelperFactory;
 import it.cnr.isti.hpc.dexter.relatedness.MilneRelatedness;
-import it.cnr.isti.hpc.dexter.relatedness.MilneRelatedness2;
-import it.cnr.isti.hpc.dexter.spot.Spot;
+//import it.cnr.isti.hpc.dexter.relatedness.MilneRelatedness2;
+//import it.cnr.isti.hpc.dexter.spot.Spot;
 import it.cnr.isti.hpc.dexter.spot.SpotMatch;
 import it.cnr.isti.hpc.dexter.spot.SpotMatchList;
 
@@ -81,7 +81,7 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 	 */
 	private ArrayList<Integer> dimBinGenes;
 	
-	private IdHelper helper = IdHelperFactory.getStdIdHelper();
+	//private IdHelper helper = IdHelperFactory.getStdIdHelper();
 
 	/**
 	 * Costruttore di classe, avvalora gli attributi usando i paramentri in input.
@@ -102,7 +102,7 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 	 * Crea questo cromosoma in maniera random, cio&egrave; sceglie un valore casuale per ogni gene. Se l'id del 
 	 * cromosoma &egrave; 0, assegna od ogni gene il valore 0 che rappresenta l'entit&agrave;  candidata pi&ugrave; probabile.
 	 */
-	public void createRandom()
+	public void createRandom(ListGenesRelatedness listGenesBestRel)
 	{
 		if (this.genes.size() != 0)
 			return;
@@ -128,8 +128,74 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 				
 		}
 		
-		this.fitness = calculateFitness();
+		this.fitness = calculateFitness(listGenesBestRel);
 		
+	}
+	
+	public void createRandom2(ListGenesRelatedness listGenesBestRel, int sizePop)
+	{
+		if (this.genes.size() != 0)
+			return;
+		
+		int halfSizePop = sizePop / 2;
+		int firstHalfSizePop = halfSizePop / 2;
+		int secondHalfSizePop = (sizePop + halfSizePop) / 2;
+		
+		int smlSize = spotMatchList.size();
+		Random rand = new Random();
+		for( int i = 0; i < smlSize; i++ )
+		{
+			int dimBinMax = dimBinGenes.get(i);
+			SpotMatch spot = spotMatchList.get(i);
+			EntityMatchList eml = spot.getEntities();
+			int emlSize = eml.size();
+			
+			if(this.id == 0)
+			{
+				genes.add(new Gene(i, 0, emlSize-1, dimBinMax));
+			}
+			else
+			{	
+				//int genNum = rand.nextInt(emlSize);
+				//genes.add(new Gene(i, genNum, emlSize-1, dimBinMax));
+				if (emlSize > 10)
+				{
+					int emlHalfSize = emlSize / 2;
+					int emlFirstHalf = emlHalfSize / 2;
+					int emlSecondHalf = (emlSize + emlHalfSize) / 2;
+				
+					if(this.id < firstHalfSizePop)
+					{
+						int genNum = rand.nextInt(emlFirstHalf);
+						genes.add(new Gene(i, genNum, emlSize-1, dimBinMax));
+					}
+					else if(this.id >= firstHalfSizePop && this.id < halfSizePop)
+					{
+						int genNum = rand.nextInt((emlHalfSize - emlFirstHalf)) + emlFirstHalf;
+						genes.add(new Gene(i, genNum, emlSize-1, dimBinMax));
+					}
+					else if(this.id >= halfSizePop && this.id < secondHalfSizePop)
+					{
+						int genNum = rand.nextInt((emlSecondHalf - emlHalfSize)) + emlHalfSize;
+						genes.add(new Gene(i, genNum, emlSize-1, dimBinMax));
+					}
+					else if(this.id >= secondHalfSizePop && this.id < sizePop)
+					{
+						int genNum = rand.nextInt((emlSize - emlSecondHalf)) + emlSecondHalf;
+						genes.add(new Gene(i, genNum, emlSize-1, dimBinMax));
+					}
+				}
+				else
+				{
+					int genNum = rand.nextInt(emlSize);
+					genes.add(new Gene(i, genNum, emlSize-1, dimBinMax));
+				}
+				
+			}
+				
+		}
+		
+		this.fitness = calculateFitness(listGenesBestRel);
 	}
 	
 	/**
@@ -137,7 +203,7 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 	 * 
 	 * @return un double che &egrave; la fitness di questo cromosoma.
 	 */
-	public double calculateFitness()
+	public double calculateFitness(ListGenesRelatedness listGenesBestRel)
 	{
 		double fit = 0.0;
 		ArrayList<CoupleRelatedness> listRel = allCouple();
@@ -145,7 +211,7 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 		int numGenes = genes.size();
 		for (Gene g : genes)
 		{
-			fit += calculateFitnessGene(g, listRel, numGenes);
+			fit += calculateFitnessGene(g, listRel, numGenes, listGenesBestRel);
 		}
 		
 		return fit;
@@ -268,7 +334,7 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 	 * @param numGenes Numero di geni.
 	 * @return La somma di tutte le coppie di correlazione dove compare il gene in input.
 	 */
-	private double calculateFitnessGene(Gene g, List<CoupleRelatedness> listRel, int numGenes)
+	private double calculateFitnessGene(Gene g, List<CoupleRelatedness> listRel, int numGenes, ListGenesRelatedness listGenesBestRel)
 	{
 		//CAMBIAMENTO
 		/*
@@ -277,17 +343,19 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 		 * sono sbagliate possono abbassare drasticamente la fitness del gene (che magari è anche una soluzione),
 		 * non permettendo la sua successiva annotazione, oppure favorendo un suo cambiamento nel caso di mutazione.
 		 */
+		int posGene = g.getPos();
 		
 		int divisor = 3;
 		int numBestRel = numGenes / divisor;
 		
-		
 		//Caso limite
-		if (numBestRel == 0)
+		if(numGenes >= 3)
+			numBestRel = 2;
+		else if (numBestRel == 0)
 			numBestRel = 1;
 		//Modifica numBest al più 2.
-		if (numBestRel >= 2)
-			numBestRel = 2;
+		//if (numBestRel >= 2)
+			//numBestRel = 2;
 			
 		
 		ArrayList<CoupleRelatedness> best = new ArrayList<CoupleRelatedness>();
@@ -310,14 +378,26 @@ public class Chromosome implements Comparable<Chromosome>, Iterable<Gene>
 		//Ordiniamo la lista di coppie di correlazione in ordine decrescente in base alla correlazione.
 		best.sort(null);
 		
+		//We will store the best pairs for this gene
+		BestRelPairs bestPairs = new BestRelPairs();
+		
 		for (int i = 0; i < numBestRel; i++)
 		{
 			CoupleRelatedness temp = best.get(i);
+			
+			//Storing temp
+			bestPairs.addPair(temp);
+			
 			fitBestG += temp.relatedness;
 		}
 		
 		double avFit = fitBestG / numBestRel;
 		g.setAverageFitness(avFit);
+		
+		//Set avFit for bestPairs
+		bestPairs.setBestRelatedness(avFit);
+		//Update if this bestPairs is the new best
+		listGenesBestRel.updateIfBest(bestPairs, posGene);
 
 		return fitG;
 	}

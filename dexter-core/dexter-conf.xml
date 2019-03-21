@@ -6,7 +6,7 @@
 		<model>
 			<name>en</name>
 			<!-- <path>/data/diego/model20130403</path> -->
-            <path>/en-model-20180901</path>
+            <path>/en-model-20140707</path>
             
 		</model>
 		<model>
@@ -134,8 +134,8 @@
 		</disambiguator>
 		<!-- AGGIUNTA -->
 		<disambiguator>
-			<name>genetic</name>
-			<class>it.cnr.isti.hpc.dexter.disambiguation.GeneticDisambiguator</class>
+			<name>GANEL</name>
+			<class>it.cnr.isti.hpc.dexter.disambiguation.GANELDisambiguator</class>
 		</disambiguator>
 	</disambiguators>
 
@@ -168,12 +168,14 @@
 		<spotter>
 			<name>wiki-dictionary</name>
 			<class>it.cnr.isti.hpc.dexter.spotter.DictionarySpotter</class>
+
 			<filters>
 				<filter>
 					<name>probability-filter</name>
 				</filter>
 				
 			</filters>
+			
 		</spotter>
 		<!-- AGGIUNTA SPOTTER -->
 		<spotter>
@@ -185,6 +187,10 @@
 				</filter>
 				
 			</filters>
+		</spotter>
+		<spotter>
+			<name>nif2</name>
+			<class>it.cnr.isti.hpc.dexter.spotter.NifSpotter2</class>
 		</spotter>
 	</spotters>
 	<taggers>

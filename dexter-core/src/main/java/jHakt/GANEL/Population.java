@@ -1,4 +1,4 @@
-package ganel;
+package jHakt.GANEL;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -252,7 +252,7 @@ public class Population implements Iterable<Chromosome>
 	 * @return un ArrayList che contiene la prole generata da questo operatore.
 	 * @see Gene
 	 */
-	public static ArrayList<Chromosome> crossover(Chromosome parent1, Chromosome parent2)
+	public static ArrayList<Chromosome> crossover(Chromosome parent1, Chromosome parent2, ListGenesRelatedness listGenesBestRel)
 	{
 		ArrayList<Chromosome> newOffspring = new ArrayList<Chromosome>();
 		//Random random = new Random();
@@ -290,8 +290,8 @@ public class Population implements Iterable<Chromosome>
 			
 		}
 		
-		off1.setFitness(off1.calculateFitness());
-		off2.setFitness(off2.calculateFitness());
+		off1.setFitness(off1.calculateFitness(listGenesBestRel));
+		off2.setFitness(off2.calculateFitness(listGenesBestRel));
 		
 		newOffspring.add(off1);
 		newOffspring.add(off2);
@@ -307,7 +307,7 @@ public class Population implements Iterable<Chromosome>
 	 * @param probMutation Tasso di mutazione.
 	 * @see Gene
 	 */
-	public static void mutation(ArrayList<Chromosome> offspring, double probMutation)
+	public static void mutation(ArrayList<Chromosome> offspring, double probMutation, ListGenesRelatedness listGenesBestRel)
 	{
 		Random random = new Random();
 		boolean change = false;
@@ -336,7 +336,7 @@ public class Population implements Iterable<Chromosome>
 			
 			if(change == true)
 			{
-				off1.setFitness(off1.calculateFitness());
+				off1.setFitness(off1.calculateFitness(listGenesBestRel));
 			}
 			
 		}
@@ -358,7 +358,7 @@ public class Population implements Iterable<Chromosome>
 			
 			if (change == true)
 			{
-				off2.setFitness(off2.calculateFitness());
+				off2.setFitness(off2.calculateFitness(listGenesBestRel));
 			}
 		}
 		

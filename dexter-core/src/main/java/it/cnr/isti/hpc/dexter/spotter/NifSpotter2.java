@@ -2,50 +2,36 @@ package it.cnr.isti.hpc.dexter.spotter;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-//import java.util.List;
+import java.util.List;
 import java.util.Set;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
 import it.cnr.isti.hpc.dexter.common.Document;
 import it.cnr.isti.hpc.dexter.common.Field;
 import it.cnr.isti.hpc.dexter.entity.Entity;
 import it.cnr.isti.hpc.dexter.entity.EntityMatch;
 import it.cnr.isti.hpc.dexter.entity.EntityMatchList;
+import it.cnr.isti.hpc.dexter.label.IdHelper;
+import it.cnr.isti.hpc.dexter.label.IdHelperFactory;
 import it.cnr.isti.hpc.dexter.spot.Spot;
 import it.cnr.isti.hpc.dexter.spot.SpotMatch;
 import it.cnr.isti.hpc.dexter.spot.SpotMatchList;
-import it.cnr.isti.hpc.dexter.spot.repo.SpotRepository;
-import it.cnr.isti.hpc.dexter.spot.repo.SpotRepositoryFactory;
 import it.cnr.isti.hpc.dexter.util.DexterLocalParams;
 import it.cnr.isti.hpc.dexter.util.DexterParams;
 import it.cnr.isti.hpc.structure.LRUCache;
 import jHakt.Utils.NifMention;
 import jHakt.Utils.ProcessingText;
 
-public class NifSpotter extends AbstractSpotter implements Spotter
+public class NifSpotter2 extends AbstractSpotter implements Spotter 
 {
-
-	/**
-	 * Logger for this class
-	 */
-	//private static final Logger logger = LoggerFactory
-		//	.getLogger(NifSpotter.class);
-
 	private static LRUCache<String, Spot> cache;
 
 	DexterParams params = DexterParams.getInstance();
-
-	SpotRepository spotRepo;
 	
-	public NifSpotter()
+	public NifSpotter2()
 	{
 		int cachesize = params.getCacheSize("spotter");
 		cache = new LRUCache<String, Spot>(cachesize);
-		SpotRepositoryFactory factory = new SpotRepositoryFactory();
-		spotRepo = factory.getStdInstance();
 	}
-	
-	
+
 	@Override
 	public SpotMatchList match(DexterLocalParams localParams, Document document) 
 	{
@@ -79,7 +65,10 @@ public class NifSpotter extends AbstractSpotter implements Spotter
 				} 
 				else 
 				{
-					spotMention = spotRepo.getSpot(mention);
+					//spotMention = spotRepo.getSpot(mention);
+					IdHelper helper = IdHelperFactory.getStdIdHelper();
+					Set<Integer> ids = helper.getIds(mention);
+					spotMention = getSpotFromIds(mention, ids);
 					cache.put(mention, spotMention);
 				}
 				
@@ -96,16 +85,7 @@ public class NifSpotter extends AbstractSpotter implements Spotter
 				
 				matches.add(match);
 			}
-			
 		}
-		
-		/*
-		for (SpotMatch sm : matches)
-		{
-			Spot m = sm.getSpot();
-			System.out.println(m);
-		}
-		*/
 		
 		return matches;
 		
@@ -115,6 +95,23 @@ public class NifSpotter extends AbstractSpotter implements Spotter
 	public void init(DexterParams dexterParams, DexterLocalParams defaultModuleParams) 
 	{
 		// TODO Auto-generated method stub
+		
+	}
+
+	private Spot getSpotFromIds(String mention, Set<Integer> ids)
+	{
+		//VALUE 10 has no meaning here
+		
+		List<Entity> entities = new ArrayList<Entity>();
+		for(int id: ids)
+		{
+			Entity temp = new Entity(id, 10);
+			entities.add(temp);
+		}
+		
+		Spot s = new Spot(mention, entities, 10, 10);
+		
+		return s;
 		
 	}
 	
@@ -134,5 +131,6 @@ public class NifSpotter extends AbstractSpotter implements Spotter
 		
 		return eml;
 	}
-
+	
+	
 }

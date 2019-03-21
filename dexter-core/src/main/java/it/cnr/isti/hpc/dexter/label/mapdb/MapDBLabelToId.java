@@ -19,10 +19,10 @@ import it.cnr.isti.hpc.dexter.label.IdHelper;
 import it.cnr.isti.hpc.dexter.label.LabelToId;
 import it.cnr.isti.hpc.dexter.label.LabelToIdWriter;
 import it.cnr.isti.hpc.mapdb.MapDB;
-
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,5 +96,31 @@ public class MapDBLabelToId implements LabelToId, LabelToIdWriter {
 	@Override
 	public void close() {
 		db.close();
+	}
+
+	@Override
+	public Set<Integer> getIds(String label) {
+		
+		String newLabel = label.replaceAll(" ", "_");
+		Set<String> keys = map.keySet()
+				.stream().filter(s -> s.toLowerCase().startsWith(newLabel.toLowerCase()))
+				//.filter(s -> s.toLowerCase().contains("category:"))
+				//.filter(s -> s.toLowerCase().contains("list_"))
+				//.stream().filter(s -> s.toLowerCase().contains(newLabel.toLowerCase()) && !(s.startsWith("Category:")) 
+					//	&& !(s.startsWith("List_")) && !(s.contains("(disambiguation)")))
+				.collect(Collectors.toSet());
+		
+		Set<Integer> idSet = new TreeSet<Integer>();
+		for(String key: keys)
+		{
+			Integer id = getId(key);
+			//Disambiguation entity
+			if(id < 0)
+				continue;
+			
+			idSet.add(id);
+		}
+		
+		return idSet;
 	}
 }

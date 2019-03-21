@@ -16,6 +16,8 @@
 package it.cnr.isti.hpc.dexter.spot;
 
 import it.cnr.isti.hpc.dexter.entity.Entity;
+import it.cnr.isti.hpc.dexter.label.IdHelper;
+import it.cnr.isti.hpc.dexter.label.IdHelperFactory;
 import it.cnr.isti.hpc.io.reader.RecordParser;
 import it.cnr.isti.hpc.text.IntArrayString;
 
@@ -468,11 +470,14 @@ public class Spot implements Serializable, Cloneable
 		int link = scanner.nextInt();
 		int freq = scanner.nextInt();
 		Spot s = new Spot(spot, ent, link, freq);
+		
+		scanner.close();
 		return s;
 	}
 
 	@Override
 	public String toString() {
+		IdHelper helper = IdHelperFactory.getStdIdHelper();
 		StringBuilder sb = new StringBuilder("[" + mention + "] idf:"
 				+ getIdf() + "\t probability:" + linkProbability + "\t link "
 				+ link);
@@ -480,7 +485,7 @@ public class Spot implements Serializable, Cloneable
 		int i = 1;
 
 		for (Entity e : getEntities()) {
-			System.out.println("e " + e.getId() + " freq: " + e.getFrequency());
+			System.out.println("id: " + e.getId() + " label: " + helper.getLabel(e.getId()) + " freq: " + e.getFrequency());
 			sb.append("\t entity").append(i++).append("\t").append(e.getId())
 					.append("\t p(e|spot)=")
 					.append(e.getFrequency() / (double) getLink()).append("\n");

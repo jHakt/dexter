@@ -21,6 +21,11 @@ import it.cnr.isti.hpc.dexter.label.IdHelperFactory;
 import it.cnr.isti.hpc.dexter.spot.Spot;
 import it.cnr.isti.hpc.dexter.spot.repo.SpotRepository;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +84,7 @@ public class RamSpotRepository implements SpotRepository {
 		s.stop("offsets");
 		s.start("spot");
 		Spot sp = Spot.fromByteArray(spot, binspot);
+		//Spot sp = Spot.fromTsvLine(spot);
 		s.stop("spot");
 		// System.out.println("retrieved: "+s.stat());
 		return sp;
@@ -90,13 +96,25 @@ public class RamSpotRepository implements SpotRepository {
 		Stopwatch s = new Stopwatch();
 		s.start("spot");
 		//Spot spot = rs.getSpot("glass");
-		Spot spot = rs.getSpot("dybala");
+		Spot spot = rs.getSpot("ps2");
 		s.stop("spot");
 		System.out.println(spot);
 		
-		//IdHelper helper = IdHelperFactory.getStdIdHelper();
-		//System.out.println(helper.getLabel(4224));
-		// System.out.println("retrieved: "+s.stat("spot"));
+		/*
+		IdHelper helper = IdHelperFactory.getStdIdHelper();
+		String label = "kansas city";
+		Set<Integer> ids = helper.getIds(label);
+		
+		
+		for(int id: ids)
+		{
+			System.out.println("id: " + id + " name: " + helper.getLabel(id));
+		} 
+		System.out.println(ids.size());
+		
+		*/
+		//System.out.println(helper.getLabel(1062161));
+		//System.out.println("retrieved: "+s.stat("spot"));
 
 	}
 

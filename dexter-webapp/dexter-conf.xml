@@ -6,7 +6,7 @@
 			<name>en</name>
 			<!-- <path>../dexter-core/data</path> -->
 			<!-- <path>../dexter-core/en-model-20140707</path> -->
-			<path>../dexter-core/en-model-20180901</path>
+			<path>../dexter-core/en-model-20140707</path>
 		</model>
 		<model>
 			<name>it</name>
@@ -113,8 +113,8 @@
 		</disambiguator>
 		<!-- AGGIUNTA -->
 		<disambiguator>
-			<name>genetic</name>
-			<class>it.cnr.isti.hpc.dexter.disambiguation.GeneticDisambiguator</class>
+			<name>GANEL</name>
+			<class>it.cnr.isti.hpc.dexter.disambiguation.GANELDisambiguator</class>
 		</disambiguator>
 	</disambiguators>
 	<spotFilters>
@@ -151,6 +151,10 @@
 		<spotter>
 			<name>nif</name>
 			<class>it.cnr.isti.hpc.dexter.spotter.NifSpotter</class>
+		</spotter>
+		<spotter>
+			<name>nif2</name>
+			<class>it.cnr.isti.hpc.dexter.spotter.NifSpotter2</class>
 		</spotter>
 	</spotters>
 	<taggers>

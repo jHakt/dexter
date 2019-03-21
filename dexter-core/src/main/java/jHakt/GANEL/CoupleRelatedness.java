@@ -1,4 +1,4 @@
-package ganel;
+package jHakt.GANEL;
 
 /**
  * Modella l'entit&agrave; coppia di correlazione (e1, e2), dove "e" &egrave; un'entit&agrave; candidata.
@@ -71,16 +71,18 @@ public class CoupleRelatedness implements Comparable<CoupleRelatedness>
 
 	Gene getGene2() { return gene2; }
 
-	double getRelatedness() { return relatedness; }
+	public double getRelatedness() { return relatedness; }
 	
 	void setRelatedness(double relatedness)
 	{
 		this.relatedness = relatedness;
 	}
 	
+	//Change: A gene is in a couple only if it is a gene1, otherwise we will consider two times the correlation
 	boolean geneInCouple(Gene g)
 	{
-		if(g.equals(this.gene1) || g.equals(this.gene2))
+		//if(g.equals(this.gene1) || g.equals(this.gene2))
+		if(g.equals(this.gene1))
 			return true;
 		
 		return false;
@@ -95,7 +97,20 @@ public class CoupleRelatedness implements Comparable<CoupleRelatedness>
 			return 1;
 		
 		return 0;
+	
+	}
+	
+	public String toString()
+	{
+		String s = "Couple:\n";
 		
+		s += "Gene1 pos: " + gene1.getPos() + " id: " + this.id1 + "\n";
+		s += "Gene2 pos: " + gene2.getPos() + " id: " + this.id2 + "\n";
+		
+		s += "\n";
+		
+		return s;
 		
 	}
+	
 }
